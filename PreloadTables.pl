@@ -44,6 +44,7 @@ chomp(my $roundnum = <STDIN>);
 # Populate database tables
 load_confederations();
 load_countries();
+#load_timezones();
 load_rounds($roundnum);
 load_penoutcomes();
 load_fieldpos();
@@ -112,6 +113,34 @@ sub load_countries {
 	# close list file
 	close(LIST);
 }
+
+# load time zones table
+sub load_timezones {
+	# open list file -- 3 columns: confederation, country, and offset
+	open(LIST,"lists/timezone_list.dat");
+	
+	# prepare query and insertion statements
+	$sth = $dbh->prepare("INSERT INTO tbl_timezones(confed_id,tz_name,tz_offset) VALUES (?,?,?)");
+	$qth = $dbh->prepare("SELECT confed_id FROM tbl_confederations WHERE confed_name=?");
+	
+	# execute
+	while (<LIST>) {
+		chomp;
+		my (@cstr) = split(/,\s+/);
+		$qth->execute($cstr[0]) || die "Could not execute query: " . $qth->$errstr;
+		while (my @data = $qth->fetchrow_array) {
+			my $confedid = $data[0];
+			$sth->execute($confedid,$cstr[1],$cstr[2]);
+		}
+		$qth->finish();
+	}
+	
+	# commit
+	$dbh->commit();	
+	# close list file
+	close(LIST);	
+}
+
 
 # load rounds table
 sub load_rounds {
