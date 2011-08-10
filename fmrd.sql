@@ -91,11 +91,18 @@ CREATE TABLE tbl_timezones (
     tz_offset       integer DEFAULT 0 CHECK (tzoffset >= -12 AND tzoffset <= 12)
     ) WITH OIDS;
 
+-- Venue playing surfaces table
+CREATE SEQUENCE surfseq increment 1 minvalue 1 maxvalue 9 start 1;
+CREATE TABLE tbl_venuesurfaces (
+    venuesurface_id     integer PRIMARY KEY DEFAULT nextval('surfseq'),
+    vensurf_desc        varchar(20) NOT NULL
+    ) WITH OIDS; 
+
 -- Competitions table
 CREATE SEQUENCE compseq increment 1 minvalue 100 maxvalue 999 start 100;
 CREATE TABLE tbl_competitions (
 	competition_id	integer PRIMARY KEY DEFAULT nextval('compseq'),
-	comp_name				varchar(100) NOT NULL
+	comp_name		varchar(100) NOT NULL
 	) WITH OIDS;
 	
 -- Rounds table	
@@ -128,18 +135,29 @@ CREATE TABLE tbl_venues (
 	ven_longitude		numeric(9,6) CHECK (ven_longitude >= -180.000000
 											AND ven_longitude <=  180.000000)
 	) WITH OIDS;
+
+-- Venue surface/capacity historical tracking table
+CREATE SEQUENCE venhistseq increment 1 minvalue 10000 maxvalue 99999 start 10000;
+CREATE TABLE tbl_venuehistory (
+    venuehistory_id     integer PRIMARY KEY DEFAULT nextval('venhistseq'),
+    venue_id            integer REFERENCES tbl_venues,
+    venuehist_date      date,
+    venuesurface_id     integer REFERENCES tbl_venuesurfaces,
+    venuehist_capacity  integer DEFAULT 0 CHECK (venuehist_capacity >= 0),
+    venuehist_seats     integer DEFAULT 0 CHECK (venuehist_seats >= 0)
+    ) WITH OIDS;
 		
 -- Match table
 CREATE SEQUENCE matchseq increment 1 minvalue 1000000 maxvalue 9999999 start 1000000;
 CREATE TABLE tbl_matches (
-	match_id							integer PRIMARY KEY DEFAULT nextval('matchseq'),
-	match_date						date,
+	match_id				integer PRIMARY KEY DEFAULT nextval('matchseq'),
+	match_date				date,
 	match_firsthalftime	 	integer DEFAULT 45 CHECK (match_firsthalftime > 0),
 	match_secondhalftime 	integer DEFAULT 45 CHECK (match_secondhalftime >= 0),
-	competition_id				integer REFERENCES tbl_competitions,
-	round_id							integer REFERENCES tbl_rounds,
-	venue_id							integer REFERENCES tbl_venues,
-	referee_id						integer REFERENCES tbl_referees
+	competition_id			integer REFERENCES tbl_competitions,
+	round_id				integer REFERENCES tbl_rounds,
+	venue_id				integer REFERENCES tbl_venues,
+	referee_id				integer REFERENCES tbl_referees
 	) WITH OIDS;
 	
 -- Lineup table
