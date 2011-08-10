@@ -82,6 +82,15 @@ CREATE TABLE tbl_referees (
 -- Match Overview Tables
 -- -------------------------------------------------
 
+-- Time zones table
+CREATE SEQUENCE tzseq increment 1 minvalue 100 maxvalue 999 start 100;
+CREATE TABLE tbl_timezones (
+    timezone_id     integer PRIMARY KEY DEFAULT nextval('tzseq'),
+    confed_id       integer REFERENCES tbl_confederations,
+    tz_name         varchar(80) NOT NULL,
+    tz_offset       integer DEFAULT 0 CHECK (tzoffset >= -12 AND tzoffset <= 12)
+    ) WITH OIDS;
+
 -- Competitions table
 CREATE SEQUENCE compseq increment 1 minvalue 100 maxvalue 999 start 100;
 CREATE TABLE tbl_competitions (
@@ -92,7 +101,7 @@ CREATE TABLE tbl_competitions (
 -- Rounds table	
 CREATE SEQUENCE roundseq increment 1 minvalue 10 maxvalue 99 start 10;
 CREATE TABLE tbl_rounds (
-	round_id		integer PRIMARY KEY DEFAULT nextval('roundseq'),
+	round_id	integer PRIMARY KEY DEFAULT nextval('roundseq'),
 	round_desc 	varchar(20) NOT NULL
 	) WITH OIDS;
 
@@ -107,17 +116,17 @@ CREATE TABLE tbl_teams (
 -- Venues table
 CREATE SEQUENCE venueseq increment 1 minvalue 1000 maxvalue 9999 start 1000;
 CREATE TABLE tbl_venues (
-	venue_id				integer PRIMARY KEY DEFAULT nextval('venueseq'),
-	team_id					integer REFERENCES tbl_teams,
+	venue_id			integer PRIMARY KEY DEFAULT nextval('venueseq'),
+	team_id				integer REFERENCES tbl_teams,
 	country_id			integer REFERENCES tbl_countries,
-	ven_city				varchar(40) NOT NULL,
-	ven_name				varchar(40) NOT NULL,
+	ven_city			varchar(40) NOT NULL,
+	ven_name			varchar(40) NOT NULL,
 	ven_altitude		numeric(4,0) CHECK (ven_altitude >= -200
-																	AND ven_altitude <= 4500),
+											AND ven_altitude <= 4500),
 	ven_latitude		numeric(8,6) CHECK (ven_latitude >= -90.000000
-																	AND ven_latitude <=  90.000000),
+											AND ven_latitude <=  90.000000),
 	ven_longitude		numeric(9,6) CHECK (ven_longitude >= -180.000000
-																	AND ven_longitude <=  180.000000)
+											AND ven_longitude <=  180.000000)
 	) WITH OIDS;
 		
 -- Match table
