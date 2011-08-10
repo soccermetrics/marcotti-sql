@@ -186,10 +186,11 @@ CREATE VIEW lineup_list AS
 				 matchup,
 				 tm_name AS team,
 				 full_name AS player,
+				 sort_name,
 				 positions_list.position_name,
 				 lp_starting AS starter,
 				 lp_captain AS captain,
-				 sort_name				 
+				 
 	FROM tbl_teams, players_list, positions_list, match_list, tbl_lineups
 	WHERE tbl_lineups.team_id = tbl_teams.team_id
 	  AND tbl_lineups.match_id = match_list.match_id 
