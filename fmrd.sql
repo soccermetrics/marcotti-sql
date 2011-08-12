@@ -125,14 +125,14 @@ CREATE SEQUENCE venueseq increment 1 minvalue 1000 maxvalue 9999 start 1000;
 CREATE TABLE tbl_venues (
 	venue_id			integer PRIMARY KEY DEFAULT nextval('venueseq'),
 	team_id				integer REFERENCES tbl_teams,
-	country_id			integer REFERENCES tbl_countries,
+	country_id		integer REFERENCES tbl_countries,
 	ven_city			varchar(40) NOT NULL,
 	ven_name			varchar(40) NOT NULL,
-	ven_altitude		numeric(4,0) CHECK (ven_altitude >= -200
+	ven_altitude		numeric(4,0) DEFAULT 0 CHECK (ven_altitude >= -200
 											AND ven_altitude <= 4500),
-	ven_latitude		numeric(8,6) CHECK (ven_latitude >= -90.000000
+	ven_latitude		numeric(8,6) DEFAULT 0.000000 CHECK (ven_latitude >= -90.000000
 											AND ven_latitude <=  90.000000),
-	ven_longitude		numeric(9,6) CHECK (ven_longitude >= -180.000000
+	ven_longitude		numeric(9,6) DEFAULT 0.000000 CHECK (ven_longitude >= -180.000000
 											AND ven_longitude <=  180.000000)
 	) WITH OIDS;
 
