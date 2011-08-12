@@ -56,6 +56,16 @@ CREATE TABLE tbl_players (
 	plyr_nickname		varchar(30) NULL,
 	plyr_defposid		integer REFERENCES tbl_positions
 	) WITH OIDS;
+	
+-- Player height/weight tracking table
+CREATE SEQUENCE plyrhistseq increment 1 minvalue 1000000 maxvalue 9999999 start 1000000;
+CREATE TABLE tbl_playerhistory (
+	playerhistory_id 	integer PRIMARY KEY DEFAULT nextval('plyrhistseq'),
+	player_id					integer REFERENCES tbl_players,
+	plyrhist_date			date,
+	plyrhist_height 	numeric(3,2) DEFAULT 1.50 CHECK (plyrhist_height >= 0 AND plyrhist_height <= 2.50),
+	plyrhist_weight   numeric(3,0) DEFAULT 50 CHECK (plyrhist_weight >= 0 AND plyrhist_weight <= 150)
+	) WITH OIDS;
 
 -- Manager table
 CREATE SEQUENCE mgrseq increment 1 minvalue 1000 maxvalue 9999 start 1000;
