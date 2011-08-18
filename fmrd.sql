@@ -98,7 +98,7 @@ CREATE TABLE tbl_timezones (
     timezone_id     integer PRIMARY KEY DEFAULT nextval('tzseq'),
     confed_id       integer REFERENCES tbl_confederations,
     tz_name         varchar(80) NOT NULL,
-    tz_offset       numeric(3,1) DEFAULT 0 CHECK (tzoffset >= -12.0 AND tzoffset <= 12.0)
+    tz_offset       numeric(3,1) DEFAULT 0 CHECK (tz_offset >= -12.0 AND tz_offset <= 12.0)
     ) WITH OIDS;
 
 -- Venue playing surfaces table
