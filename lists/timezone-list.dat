@@ -6,7 +6,7 @@ CONCACAF ,  America/Anguilla                , -4
 UEFA ,  Europe/Tirane                   , +1 
 UEFA ,  Asia/Yerevan                    , +4 
 CONCACAF ,  America/Curacao                 , -4 
-AFC ,  Africa/Luanda                   , +1 
+CAF ,  Africa/Luanda                   , +1 
 CONMEBOL ,  America/Argentina/Buenos_Aires  , -3 
 CONMEBOL ,  America/Argentina/Cordoba       , -3 
 CONMEBOL ,  America/Argentina/Salta         , -3 
@@ -40,7 +40,7 @@ UEFA ,  Europe/Sarajevo                 , +1
 CONCACAF ,  America/Barbados                , -4    
 AFC ,  Asia/Dhaka                      , +6    
 UEFA ,  Europe/Brussels                 , +1    
-AFC ,  Africa/Ouagadougou              , +0    
+CAF ,  Africa/Ouagadougou              , +0    
 UEFA ,  Europe/Sofia                    , +2    
 AFC ,  Asia/Bahrain                    , +3    
 CAF ,  Africa/Bujumbura                , +2    
@@ -343,7 +343,7 @@ UEFA ,  Europe/Kiev                     , +2
 UEFA ,  Europe/Uzhgorod                 , +2    
 UEFA ,  Europe/Zaporozhye               , +2    
 UEFA ,  Europe/Simferopol               , +2    
-AFC ,  Africa/Kampala                  , +3    
+CAF ,  Africa/Kampala                  , +3    
 OFC ,  Pacific/Johnston                , -10    
 OFC ,  Pacific/Midway                  , -11    
 OFC ,  Pacific/Wake                    , +12    
