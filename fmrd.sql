@@ -1,5 +1,5 @@
 -- fmrd.sql: Football Match Result Database schema
--- Version 1.0.0
+-- Version 1.1.0
 -- Developed by: Howard Hamilton (2010-07-24)
 
 SET DATESTYLE TO 'ISO';
@@ -136,6 +136,7 @@ CREATE TABLE tbl_venues (
 	venue_id			integer PRIMARY KEY DEFAULT nextval('venueseq'),
 	team_id				integer REFERENCES tbl_teams,
 	country_id		integer REFERENCES tbl_countries,
+	timezone_id		integer REFERENCES tbl_timezones,
 	ven_city			varchar(40) NOT NULL,
 	ven_name			varchar(40) NOT NULL,
 	ven_altitude		numeric(4,0) DEFAULT 0 CHECK (ven_altitude >= -200
