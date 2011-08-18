@@ -12,6 +12,10 @@ use DBI qw(:sql_types);
 use DBD::Pg;
 use Term::ReadKey;
 
+# declare subroutines
+sub trim($);
+sub rtrim($);
+
 ($dbname) = @ARGV;
 
 $attempt = 0;
@@ -127,10 +131,10 @@ sub load_timezones {
 	while (<LIST>) {
 		chomp;
 		my (@cstr) = split(/,\s+/);
-		$qth->execute($cstr[0]) || die "Could not execute query: " . $qth->$errstr;
+		$qth->execute(trim($cstr[0])) || die "Could not execute query: " . $qth->$errstr;
 		while (my @data = $qth->fetchrow_array) {
 			my $confedid = $data[0];
-			$sth->execute($confedid,$cstr[1],$cstr[2]);
+			$sth->execute($confedid,trim($cstr[1]),trim($cstr[2]));
 		}
 		$qth->finish();
 	}
@@ -370,4 +374,20 @@ sub load_fouls {
 	
 	# close list file
 	close(LIST);		
+}
+
+# Perl trim function to remove whitespace from the start and end of the string
+sub trim($)
+{
+	my $string = shift;
+	$string =~ s/^\s+//;
+	$string =~ s/\s+$//;
+	return $string;
+}
+# Right trim function to remove trailing whitespace
+sub rtrim($)
+{
+	my $string = shift;
+	$string =~ s/\s+$//;
+	return $string;
 }
