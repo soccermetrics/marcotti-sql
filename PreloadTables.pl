@@ -44,7 +44,7 @@ chomp(my $roundnum = <STDIN>);
 # Populate database tables
 load_confederations();
 load_countries();
-#load_timezones();
+load_timezones();
 load_rounds($roundnum);
 load_penoutcomes();
 load_fieldpos();
