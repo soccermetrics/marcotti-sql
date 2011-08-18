@@ -117,7 +117,7 @@ sub load_countries {
 # load time zones table
 sub load_timezones {
 	# open list file -- 3 columns: confederation, country, and offset
-	open(LIST,"lists/timezone_list.dat");
+	open(LIST,"lists/timezone-list.dat");
 	
 	# prepare query and insertion statements
 	$sth = $dbh->prepare("INSERT INTO tbl_timezones(confed_id,tz_name,tz_offset) VALUES (?,?,?)");
