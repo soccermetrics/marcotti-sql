@@ -105,7 +105,7 @@ CREATE TABLE tbl_timezones (
 CREATE SEQUENCE surfseq increment 1 minvalue 1 maxvalue 9 start 1;
 CREATE TABLE tbl_venuesurfaces (
     venuesurface_id     integer PRIMARY KEY DEFAULT nextval('surfseq'),
-    vensurf_desc        varchar(20) NOT NULL
+    vensurf_desc        varchar(30) NOT NULL
     ) WITH OIDS; 
 
 -- Competitions table
