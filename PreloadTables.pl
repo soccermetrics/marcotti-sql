@@ -50,6 +50,7 @@ load_confederations();
 load_countries();
 load_timezones();
 load_rounds($roundnum);
+load_surfaces();
 load_penoutcomes();
 load_fieldpos();
 load_flankpos();
@@ -159,6 +160,27 @@ sub load_rounds {
 	}
 	# commit
 	$dbh->commit();
+}
+
+# load venue playing surfaces table
+sub load_surfaces {
+	# open list file
+	open(LIST,"lists/fieldsurface-list.dat");
+
+	# prepare
+	$sth = $dbh->prepare("INSERT INTO tbl_venuesurfaces(vensurf_desc) VALUES (?)");
+	
+	# execute
+	while (<LIST>) {
+		chomp;
+		$sth->execute($_);
+	}
+	
+	# commit
+	$dbh->commit();
+	
+	# close list file
+	close(LIST);		
 }
 
 # load penalty outcomes table
