@@ -1,0 +1,11 @@
+FMRD-SQL Version 1.1.1
+======================
+
+Changes relative to Version 1.1.0
+---------------------------------
+
+* Expanded length of playing surface description (vensurf_desc) 
+  field in tbl_venuehistory to 30 chars
+* Added match_attendance field to tbl_matches
+* Created data file with list of playing surfaces
+* Modified PreloadTables.pl with load_surfaces() call

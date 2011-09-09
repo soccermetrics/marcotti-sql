@@ -1,0 +1,10 @@
+FMRD-SQL Version 1.1.2
+======================
+
+Changes relative to Version 1.1.1
+---------------------------------
+
+* Revised venues_list view
+* Revised teams_list view
+* Created venuehistory_list view
+* Created playerhistory_list view

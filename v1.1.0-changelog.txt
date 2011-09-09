@@ -1,0 +1,20 @@
+FMRD-SQL Version 1.1.0
+======================
+
+Changes relative to Version 1.0.0
+---------------------------------
+
+* Rearranged sort_name field in Lineup_List table
+* Added country_id field to tbl_clubs table
+* Created tbl_timezones table with following fields:
+    - name of time zone region
+    - football confederation in which region lies
+    - UTC offset (decimal hours)
+* Created tbl_venuehistory linking table to tbl_venues
+    - field surface type
+    - field dimensions (length, width)
+    - total stadium capacity (seated + standing)
+    - total number of stadium seats
+* Created tbl_playerhistory linking table to tbl_players
+    - player height
+    - player weight
