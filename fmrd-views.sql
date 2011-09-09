@@ -61,6 +61,18 @@ CREATE VIEW players_list AS
 	  AND tbl_players.plyr_defposid = positions_list.position_id;		
 
 -- -------------------------------------------------
+-- PlayerHistoryList View
+-- -------------------------------------------------
+
+CREATE VIEW playerhistory_list AS
+	SELECT player,
+				 plyrhist_date AS effective,
+				 plyrhist_height AS height,
+				 plyrhist_weight AS weight
+	FROM tbl_playerhistory, players_list
+	WHERE players_list.player_id = tbl_playerhistory.player_id;
+				 
+-- -------------------------------------------------
 -- ManagersList View
 -- -------------------------------------------------
 
