@@ -15,6 +15,17 @@ CREATE VIEW countries_list AS
 	WHERE tbl_countries.confed_id = tbl_confederations.confed_id;
 
 -- -------------------------------------------------
+-- CountriesList View
+-- -------------------------------------------------
+
+CREATE VIEW teams_list AS
+	SELECT team_id,
+				 tm_name AS team_name,
+				 cty_name AS country
+	FROM tbl_teams, tbl_countries
+	WHERE tbl_teams.country_id = tbl_countries.country_id;
+				 
+-- -------------------------------------------------
 -- PositionsList View
 -- -------------------------------------------------
 
@@ -110,11 +121,13 @@ CREATE VIEW venue_list AS
 				 ven_name AS venue,
 				 ven_city AS city,
 				 country,
+				 tz_name AS timezone,
 				 ven_altitude AS altitude,
 				 ven_latitude AS latitude,
 				 ven_longitude AS longitude
-	FROM tbl_venues, countries_list
-	WHERE countries_list.country_id = tbl_venues.country_id;				
+	FROM tbl_venues, countries_list, tbl_timezones
+	WHERE countries_list.country_id = tbl_venues.country_id
+	  AND tbl_venues.timezone_id = tbl_timezones.timezone_id;				
 
 -- -------------------------------------------------
 -- MatchList View
