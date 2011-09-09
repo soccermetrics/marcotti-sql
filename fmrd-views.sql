@@ -130,6 +130,22 @@ CREATE VIEW venue_list AS
 	  AND tbl_venues.timezone_id = tbl_timezones.timezone_id;				
 
 -- -------------------------------------------------
+-- VenueHistoryList View
+-- -------------------------------------------------
+
+CREATE VIEW venuehistory_list AS
+	SELECT venue,
+				 venuehist_date AS effective,
+				 vensurf_desc AS surface,
+				 venue_length AS length,
+				 venue_width AS width,
+				 venuehist_capacity AS capacity,
+				 venuehist_seats AS seats
+	FROM venue_list, tbl_venuehistory, tbl_venuesurfaces
+	WHERE venue_list.venue_id = tbl_venuehistory.venue_id
+	  AND tbl_venuehistory.venuesurface_id = tbl_venuesurfaces.venuesurface_id;			 
+
+-- -------------------------------------------------
 -- MatchList View
 -- -------------------------------------------------
 
