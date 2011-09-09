@@ -26,6 +26,18 @@ CREATE VIEW teams_list AS
 	WHERE tbl_teams.country_id = tbl_countries.country_id;
 				 
 -- -------------------------------------------------
+-- TimeZoneList View
+-- -------------------------------------------------
+				 
+CREATE VIEW timezone_list AS
+	SELECT timezone_id,
+				 tz_name,
+				 confed_name AS confed,
+				 tz_offset AS offset
+	FROM tbl_timezones, tbl_confederations
+	WHERE tbl_timezones.confed_id = tbl_confederations.confed_id;
+				 				 
+-- -------------------------------------------------
 -- PositionsList View
 -- -------------------------------------------------
 
