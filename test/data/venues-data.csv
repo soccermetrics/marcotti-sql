@@ -1,0 +1,3 @@
+"venue_id","team_id","country_id","timezone_id","ven_city","ven_name","ven_altitude","ven_latitude","ven_longitude"
+1000,10000,209,179,"Big City A","Big City Arena",76,43.652527,-79.381961
+1001,10001,239,458,"Metropolis B","Metropolis Stadium",5,34.052186,-118.243932
