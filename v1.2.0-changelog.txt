@@ -4,4 +4,12 @@ FMRD-SQL National Teams Version 1.2.0
 Changes relative to Version 1.1.2
 ---------------------------------
 
-* Removed tbl_teams table
+* Removed tbl_teams table and teams_list view
+* Removed reference to tbl_teams in tbl_venues
+* In tbl_hometeams/tbl_awayteams, replaced reference to
+  tbl_teams with tbl_countries
+* Updated reference in hometeams_list and awayteams_list views  
+* In tbl_goals, replaced reference to tbl_teams
+  with tbl_countries
+* In Match Event views, replaced team reference
+  with country reference (aliased as team)
