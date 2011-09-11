@@ -226,16 +226,15 @@ CREATE VIEW enviro_list AS
 CREATE VIEW lineup_list AS
 	SELECT lineup_id,
 				 matchup,
-				 tm_name AS team,
+				 country,
 				 full_name AS player,
 				 sort_name,
 				 positions_list.position_name,
 				 lp_starting AS starter,
 				 lp_captain AS captain
-	FROM tbl_teams, players_list, positions_list, match_list, tbl_lineups
-	WHERE tbl_lineups.team_id = tbl_teams.team_id
-	  AND tbl_lineups.match_id = match_list.match_id 
-	  AND players_list.player_id = tbl_lineups.player_id
+	FROM players_list, positions_list, match_list, tbl_lineups
+	WHERE tbl_lineups.match_id = match_list.match_id 
+	  AND tbl_lineups.player_id = players_list.player_id
 	  AND tbl_lineups.position_id = positions_list.position_id;
 	  
 -- -------------------------------------------------

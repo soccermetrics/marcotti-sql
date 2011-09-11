@@ -170,7 +170,6 @@ CREATE SEQUENCE lineupseq increment 1 minvalue 1000000 maxvalue 9999999 start 10
 CREATE TABLE tbl_lineups (
 	lineup_id				integer PRIMARY KEY DEFAULT nextval('lineupseq'),
 	match_id				integer REFERENCES tbl_matches,
-	team_id					integer REFERENCES tbl_teams,
 	player_id				integer REFERENCES tbl_players,
 	position_id			integer REFERENCES tbl_positions,
 	lp_starting			boolean DEFAULT FALSE,
