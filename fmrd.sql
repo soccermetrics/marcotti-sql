@@ -274,13 +274,13 @@ CREATE TABLE tbl_goalevents (
 -- Goals table	
 CREATE SEQUENCE goalseq increment 1 minvalue 100000 maxvalue 999999 start 100000;
 CREATE TABLE tbl_goals (
-	goal_id				integer PRIMARY KEY DEFAULT nextval('goalseq'),
-	team_id				integer REFERENCES tbl_teams,
-	lineup_id			integer REFERENCES tbl_lineups,
-	gtstype_id		integer REFERENCES tbl_goalstrikes,
-	gtetype_id		integer REFERENCES tbl_goalevents,
-	gls_time			integer NOT NULL CHECK (gls_time > 0 AND gls_time <= 90),
-	gls_stime			integer DEFAULT 0 CHECK (gls_stime >= 0 AND gls_stime <= 15)
+	goal_id			integer PRIMARY KEY DEFAULT nextval('goalseq'),
+	country_id	integer REFERENCES tbl_countries,
+	lineup_id		integer REFERENCES tbl_lineups,
+	gtstype_id	integer REFERENCES tbl_goalstrikes,
+	gtetype_id	integer REFERENCES tbl_goalevents,
+	gls_time		integer NOT NULL CHECK (gls_time > 0 AND gls_time <= 90),
+	gls_stime		integer DEFAULT 0 CHECK (gls_stime >= 0 AND gls_stime <= 15)
 	) WITH OIDS;
 	
 -- Cards table

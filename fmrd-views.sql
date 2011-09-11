@@ -245,17 +245,17 @@ CREATE VIEW lineup_list AS
 CREATE VIEW goals_list AS
 	SELECT goal_id,
 				 match_list.matchup,
-				 tm_name AS team,
+				 cty_name AS team,
 				 player AS scorer,
 				 gts_desc AS strike,
 				 gte_desc AS play,
 				 CASE WHEN gls_stime = 0 THEN gls_time || ''''
 				 			ELSE gls_time || '+' || gls_stime || ''''
 				 END AS time
-	FROM tbl_teams, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals
+	FROM tbl_countries, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals
 	WHERE match_list.match_id IN (SELECT match_id FROM tbl_lineups)
 		AND tbl_goals.lineup_id = lineup_list.lineup_id
-		AND tbl_goals.team_id = tbl_teams.team_id
+		AND tbl_goals.country_id = tbl_countries.country_id
 		AND tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id
 		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id;
 
