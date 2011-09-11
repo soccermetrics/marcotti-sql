@@ -183,15 +183,15 @@ CREATE TABLE tbl_lineups (
 
 -- Home/away teams
 CREATE TABLE tbl_hometeams (
-	match_id	integer REFERENCES tbl_matches,
-	team_id		integer	REFERENCES tbl_teams,
-	PRIMARY KEY (match_id, team_id)
+	match_id		integer REFERENCES tbl_matches,
+	country_id	integer	REFERENCES tbl_countries,
+	PRIMARY KEY (match_id, country_id)
 	) WITH OIDS;
 	
 CREATE TABLE tbl_awayteams (
-	match_id	integer REFERENCES tbl_matches,
-	team_id		integer	REFERENCES tbl_teams,
-	PRIMARY KEY (match_id, team_id)
+	match_id		integer REFERENCES tbl_matches,
+	country_id	integer	REFERENCES tbl_countries,
+	PRIMARY KEY (match_id, country_id)
 	) WITH OIDS;	
 
 -- Home/away managers	

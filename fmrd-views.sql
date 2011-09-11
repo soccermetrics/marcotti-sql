@@ -109,10 +109,10 @@ CREATE VIEW referees_list AS
 
 CREATE VIEW hometeam_list AS
 	SELECT tbl_matches.match_id,
-				 tm_name AS team
-	FROM tbl_matches, tbl_hometeams, tbl_teams
+				 cty_name AS team
+	FROM tbl_matches, tbl_hometeams, tbl_countries
 	WHERE tbl_matches.match_id = tbl_hometeams.match_id
-		AND tbl_hometeams.team_id = tbl_teams.team_id;
+		AND tbl_hometeams.country_id = tbl_countries.country_id;
 
 -- -------------------------------------------------
 -- AwayTeamList View
@@ -120,10 +120,10 @@ CREATE VIEW hometeam_list AS
 
 CREATE VIEW awayteam_list AS
 	SELECT tbl_matches.match_id,
-				 tm_name AS team
-	FROM tbl_matches, tbl_awayteams, tbl_teams
+				 cty_name AS team
+	FROM tbl_matches, tbl_awayteams, tbl_countries
 	WHERE tbl_matches.match_id = tbl_awayteams.match_id
-		AND tbl_awayteams.team_id = tbl_teams.team_id;
+		AND tbl_awayteams.country_id = tbl_teams.country_id;
 
 -- -------------------------------------------------
 -- VenueList View
