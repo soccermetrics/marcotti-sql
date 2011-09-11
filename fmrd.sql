@@ -126,7 +126,6 @@ CREATE TABLE tbl_rounds (
 CREATE SEQUENCE venueseq increment 1 minvalue 1000 maxvalue 9999 start 1000;
 CREATE TABLE tbl_venues (
 	venue_id			integer PRIMARY KEY DEFAULT nextval('venueseq'),
-	team_id				integer REFERENCES tbl_teams,
 	country_id		integer REFERENCES tbl_countries,
 	timezone_id		integer REFERENCES tbl_timezones,
 	ven_city			varchar(40) NOT NULL,
