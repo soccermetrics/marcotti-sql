@@ -1,0 +1,7 @@
+FMRD-SQL National Teams Version 1.2.0
+=====================================
+
+Changes relative to Version 1.1.2
+---------------------------------
+
+* Removed tbl_teams table
