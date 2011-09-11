@@ -122,14 +122,6 @@ CREATE TABLE tbl_rounds (
 	round_desc 	varchar(20) NOT NULL
 	) WITH OIDS;
 
--- Teams table	
-CREATE SEQUENCE teamseq increment 1 minvalue 10000 maxvalue 99999 start 10000;
-CREATE TABLE tbl_teams (
-	team_id 	integer PRIMARY KEY DEFAULT nextval('teamseq'),
-  country_id  integer REFERENCES tbl_countries,
-	tm_name		varchar(50) NOT NULL
-	) WITH OIDS;		
-	
 -- Venues table
 CREATE SEQUENCE venueseq increment 1 minvalue 1000 maxvalue 9999 start 1000;
 CREATE TABLE tbl_venues (
