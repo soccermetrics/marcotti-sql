@@ -123,7 +123,7 @@ CREATE VIEW awayteam_list AS
 				 cty_name AS team
 	FROM tbl_matches, tbl_awayteams, tbl_countries
 	WHERE tbl_matches.match_id = tbl_awayteams.match_id
-		AND tbl_awayteams.country_id = tbl_teams.country_id;
+		AND tbl_awayteams.country_id = tbl_countries.country_id;
 
 -- -------------------------------------------------
 -- VenueList View
@@ -226,7 +226,7 @@ CREATE VIEW enviro_list AS
 CREATE VIEW lineup_list AS
 	SELECT lineup_id,
 				 matchup,
-				 country,
+				 country AS team,
 				 full_name AS player,
 				 sort_name,
 				 positions_list.position_name,
@@ -244,7 +244,7 @@ CREATE VIEW lineup_list AS
 CREATE VIEW goals_list AS
 	SELECT goal_id,
 				 match_list.matchup,
-				 cty_name AS team,
+				 team,
 				 player AS scorer,
 				 gts_desc AS strike,
 				 gte_desc AS play,
@@ -254,7 +254,8 @@ CREATE VIEW goals_list AS
 	FROM tbl_countries, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals
 	WHERE match_list.match_id IN (SELECT match_id FROM tbl_lineups)
 		AND tbl_goals.lineup_id = lineup_list.lineup_id
-		AND tbl_goals.country_id = tbl_countries.country_id
+		AND tbl_goals.country_id IN (SELECT country_id FROM tbl_countries
+	  														 WHERE tbl_countries.cty_name = lineup_list.team)
 		AND tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id
 		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id;
 
@@ -265,20 +266,20 @@ CREATE VIEW goals_list AS
 CREATE VIEW owngoals_list AS
 	SELECT goal_id,
 				 match_list.matchup,
-				 tm_name AS team,
+				 team,
 				 player AS scorer,
 				 gts_desc AS strike,
 				 gte_desc AS play,
 				 CASE WHEN gls_stime = 0 THEN gls_time || ''''
 				 			ELSE gls_time || '+' || gls_stime || ''''
 				 END AS time
-	FROM tbl_teams, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals
+	FROM tbl_countries, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals
 	WHERE match_list.match_id IN (SELECT match_id FROM tbl_lineups)
 	  AND tbl_goals.lineup_id = lineup_list.lineup_id
-		AND tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id
-		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id	  
-	  AND tbl_goals.team_id NOT IN (SELECT team_id FROM tbl_lineups
-	  														  WHERE tbl_lineups.lineup_id = lineup_list.lineup_id);
+		AND tbl_goals.country_id NOT IN (SELECT country_id FROM tbl_countries
+	  														     WHERE tbl_countries.cty_name = lineup_list.team)
+    AND tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id
+		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id;
 
 -- -------------------------------------------------
 -- PenaltiesList View
@@ -287,6 +288,7 @@ CREATE VIEW owngoals_list AS
 CREATE VIEW penalties_list AS
 	SELECT penalty_id,
 				 matchup,
+				 team,
 				 player AS taker,
 				 foul_desc AS foul,
 				 po_desc AS outcome,
@@ -305,6 +307,7 @@ CREATE VIEW penalties_list AS
 CREATE VIEW cautions_list AS
 	SELECT offense_id,
 				 matchup,
+				 team,
 				 player,
 				 foul_desc AS foul,
 				 CASE WHEN ofns_stime = 0 THEN ofns_time || ''''
@@ -323,6 +326,7 @@ CREATE VIEW cautions_list AS
 CREATE VIEW expulsions_list AS
 	SELECT offense_id,
 				 matchup,
+				 team,
 				 player,
 				 foul_desc AS foul,
 				 CASE WHEN ofns_stime = 0 THEN ofns_time || ''''
