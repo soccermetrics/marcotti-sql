@@ -1,0 +1,7 @@
+FMRD-SQL National Teams Version 1.2.1
+=====================================
+
+Changes relative to Version 1.2.0
+---------------------------------
+
+* Removed Cartesian product in goals_list and owngoals_list views.
