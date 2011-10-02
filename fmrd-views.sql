@@ -1,7 +1,6 @@
 -- fmrd-views.sql: View schema for Football Match Result Database
--- Version: 1.0.0
--- Author: Howard Hamilton
--- Date: 2010-08-05
+-- Version: 1.2.0
+-- Author: Howard Hamilton, Soccermetrics Research & Consulting, LLC
 
 -- -------------------------------------------------
 -- CountriesList View
@@ -251,11 +250,11 @@ CREATE VIEW goals_list AS
 				 CASE WHEN gls_stime = 0 THEN gls_time || ''''
 				 			ELSE gls_time || '+' || gls_stime || ''''
 				 END AS time
-	FROM tbl_countries, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals
+	FROM match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals
 	WHERE match_list.match_id IN (SELECT match_id FROM tbl_lineups)
 		AND tbl_goals.lineup_id = lineup_list.lineup_id
-		AND tbl_goals.country_id IN (SELECT country_id FROM tbl_countries
-	  														 WHERE tbl_countries.cty_name = lineup_list.team)
+		AND team IN (SELECT cty_name FROM tbl_countries
+	  							WHERE tbl_countries.country_id = tbl_goals.country_id)
 		AND tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id
 		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id;
 
@@ -276,8 +275,8 @@ CREATE VIEW owngoals_list AS
 	FROM tbl_countries, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals
 	WHERE match_list.match_id IN (SELECT match_id FROM tbl_lineups)
 	  AND tbl_goals.lineup_id = lineup_list.lineup_id
-		AND tbl_goals.country_id NOT IN (SELECT country_id FROM tbl_countries
-	  														     WHERE tbl_countries.cty_name = lineup_list.team)
+		AND team NOT IN (SELECT cty_name FROM tbl_countries
+	  								  WHERE tbl_countries.country_id = tbl_goals.country_id)
     AND tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id
 		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id;
 

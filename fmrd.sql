@@ -1,6 +1,6 @@
 -- fmrd.sql: Football Match Result Database schema
--- Version 1.1.0
--- Developed by: Howard Hamilton (2010-07-24)
+-- Version 1.2.0
+-- Developed by: Howard Hamilton, Soccermetrics Research & Consulting, LLC
 
 SET DATESTYLE TO 'ISO';
 
