@@ -77,7 +77,7 @@ CREATE VIEW players_list AS
 -- -------------------------------------------------
 
 CREATE VIEW playerhistory_list AS
-	SELECT player,
+	SELECT full_name AS player,
 				 plyrhist_date AS effective,
 				 plyrhist_height AS height,
 				 plyrhist_weight AS weight
