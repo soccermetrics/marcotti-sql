@@ -195,6 +195,8 @@ CREATE TABLE tbl_matches (
 	match_date				date,
 	match_firsthalftime	 	integer DEFAULT 45 CHECK (match_firsthalftime > 0),
 	match_secondhalftime 	integer DEFAULT 45 CHECK (match_secondhalftime >= 0),
+	match_firstovertime     integer DEFAULT 0 CHECK (match_firstovertime >= 0),
+	match_secondovertime    integer DEFAULT 0 CHECK (match_secondovertime >= 0),
 	match_attendance		integer DEFAULT 0 CHECK (match_attendance >= 0),
 	competition_id			integer REFERENCES tbl_competitions,
 	venue_id				integer REFERENCES tbl_venues,
