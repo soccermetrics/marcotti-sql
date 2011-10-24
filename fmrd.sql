@@ -122,6 +122,12 @@ CREATE TABLE tbl_phases (
     phase_desc  varchar(12) NOT NULL
     ) WITH OIDS;
     
+CREATE SEQUENCE groupseq increment 1 minvalue 10 maxvalue 99 start 10;
+CREATE TABLE tbl_groups (
+    group_id    integer PRIMARY KEY DEFAULT nextval('groupseq'),
+    group_desc  varchar(2) NOT NULL
+    ) WITH OIDS;
+
 -- Rounds table	
 CREATE SEQUENCE roundseq increment 1 minvalue 10 maxvalue 99 start 10;
 CREATE TABLE tbl_rounds (
