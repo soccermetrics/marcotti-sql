@@ -363,6 +363,23 @@ CREATE TABLE tbl_penalties (
 	pen_stime		integer DEFAULT 0 CHECK (pen_stime >= 0 AND pen_stime <= 15)
 	) WITH OIDS;
 	
+-- Penalty Shootouts table
+CREATE SEQUENCE shootoutseq increment 1 minvalue 100000 maxvalue 999999 start 100000;
+CREATE TABLE tbl_penaltyshootouts (
+    penshootout_id  integer PRIMARY KEY DEFAULT nextval('shootoutseq'),
+    lineup_id       integer REFERENCES tbl_lineups,
+    round_id        integer REFERENCES tbl_rounds,
+    penoutcome_id   integer REFERENCES tbl_penoutcomes
+    ) WITH OIDS;
+    
+-- Penalty Shootout opener table
+CREATE SEQUENCE penopenerseq increment 1 minvalue 10000 maxvalue 99999 start 10000;
+CREATE TABLE tbl_penshootoutopeners (
+    opener_id   integer PRIMARY KEY DEFAULT nextval('penopenerseq'),
+    match_id    integer REFERENCES tbl_matches,
+    team_id     integer REFERENCES tbl_teams
+    ) WITH OIDS;
+    
 -- Substitutions table
 CREATE SEQUENCE subsseq increment 1 minvalue 100000 maxvalue 999999 start 100000;
 CREATE TABLE tbl_substitutions (
