@@ -197,7 +197,6 @@ CREATE TABLE tbl_matches (
 	match_secondhalftime 	integer DEFAULT 45 CHECK (match_secondhalftime >= 0),
 	match_attendance		integer DEFAULT 0 CHECK (match_attendance >= 0),
 	competition_id			integer REFERENCES tbl_competitions,
-	round_id				integer REFERENCES tbl_rounds,
 	venue_id				integer REFERENCES tbl_venues,
 	referee_id				integer REFERENCES tbl_referees
 	) WITH OIDS;
@@ -217,6 +216,29 @@ CREATE TABLE tbl_lineups (
 -- ---------------------------------------
 -- Linking tables	to Match Overview tables
 -- ---------------------------------------
+
+-- League matches
+CREATE TABLE tbl_leaguematches (
+    match_id    integer REFERENCES tbl_matches,
+	round_id	integer REFERENCES tbl_rounds,
+	PRIMARY KEY (match_id, round_id)
+	) WITH OIDS;   
+
+-- Group matches
+CREATE TABLE tbl_groupmatches (
+    match_id    integer REFERENCES tbl_matches,
+    group_id    integer REFERENCES tbl_groups,
+	round_id	integer REFERENCES tbl_rounds,
+	PRIMARY KEY (match_id, group_id, round_id)
+	) WITH OIDS;   
+
+-- Knockout matches
+CREATE TABLE tbl_knockoutmatches (
+    match_id    integer REFERENCES tbl_matches,
+	koround_id	integer REFERENCES tbl_knockoutrounds,
+	matchday_id integer REFERENCES tbl_matchdays,
+	PRIMARY KEY (match_id, koround_id, matchday_id)
+	) WITH OIDS;   
 
 -- Home/away teams
 CREATE TABLE tbl_hometeams (
