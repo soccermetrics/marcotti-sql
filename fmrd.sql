@@ -11,7 +11,7 @@ SET DATESTYLE TO 'ISO';
 -- Confederation table
 CREATE SEQUENCE conseq increment 1 minvalue 10 maxvalue 99 start 10;
 CREATE TABLE tbl_confederations (
-	confed_id		integer PRIMARY KEY DEFAULT nextval('conseq'),
+	confed_id	integer PRIMARY KEY DEFAULT nextval('conseq'),
 	confed_name	varchar(40) NOT NULL
 	) WITH OIDS;
 
@@ -19,22 +19,22 @@ CREATE TABLE tbl_confederations (
 CREATE SEQUENCE ctryseq increment 1 minvalue 100 maxvalue 999 start 100;
 CREATE TABLE tbl_countries (
 	country_id	integer PRIMARY KEY DEFAULT nextval('ctryseq'),
-	confed_id		integer REFERENCES tbl_confederations,
-	cty_name		varchar(60) NOT NULL
+	confed_id	integer REFERENCES tbl_confederations,
+	cty_name	varchar(60) NOT NULL
 	) WITH OIDS;
 
 -- Field position table
 CREATE SEQUENCE fieldseq increment 1 minvalue 1 maxvalue 9 start 1;
 CREATE TABLE tbl_fieldnames (
-	posfield_id			integer PRIMARY KEY DEFAULT nextval('fieldseq'),
-	posfield_name		varchar(15) NOT NULL
+	posfield_id		integer PRIMARY KEY DEFAULT nextval('fieldseq'),
+	posfield_name	varchar(15) NOT NULL
 	) WITH OIDS;
 
 -- Flank name table
 CREATE SEQUENCE flankseq increment 1 minvalue 1 maxvalue 9 start 1;
 CREATE TABLE tbl_flanknames (
-	posflank_id			integer PRIMARY KEY DEFAULT nextval('flankseq'),
-	posflank_name		varchar(8) NULL
+	posflank_id		integer PRIMARY KEY DEFAULT nextval('flankseq'),
+	posflank_name	varchar(8) NULL
 	) WITH OIDS;
 	
 -- Position table
@@ -48,23 +48,23 @@ CREATE TABLE tbl_positions (
 -- Player table
 CREATE SEQUENCE plyrseq increment 1 minvalue 100000 maxvalue 999999 start 100000;
 CREATE TABLE tbl_players (
-	player_id				integer PRIMARY KEY DEFAULT nextval('plyrseq'),
-	country_id			integer REFERENCES tbl_countries,
+	player_id		integer PRIMARY KEY DEFAULT nextval('plyrseq'),
+	country_id		integer REFERENCES tbl_countries,
 	plyr_birthdate  date NOT NULL,
 	plyr_firstname	varchar(20) NOT NULL,
-	plyr_lastname		varchar(30) NOT NULL,
-	plyr_nickname		varchar(30) NULL,
-	plyr_defposid		integer REFERENCES tbl_positions
+	plyr_lastname	varchar(30) NOT NULL,
+	plyr_nickname	varchar(30) NULL,
+	plyr_defposid	integer REFERENCES tbl_positions
 	) WITH OIDS;
 	
 -- Player height/weight tracking table
 CREATE SEQUENCE plyrhistseq increment 1 minvalue 1000000 maxvalue 9999999 start 1000000;
 CREATE TABLE tbl_playerhistory (
 	playerhistory_id 	integer PRIMARY KEY DEFAULT nextval('plyrhistseq'),
-	player_id					integer REFERENCES tbl_players,
-	plyrhist_date			date,
+	player_id			integer REFERENCES tbl_players,
+	plyrhist_date		date,
 	plyrhist_height 	numeric(3,2) DEFAULT 1.50 CHECK (plyrhist_height >= 0 AND plyrhist_height <= 2.50),
-	plyrhist_weight   numeric(3,0) DEFAULT 50 CHECK (plyrhist_weight >= 0 AND plyrhist_weight <= 150)
+	plyrhist_weight     numeric(3,0) DEFAULT 50 CHECK (plyrhist_weight >= 0 AND plyrhist_weight <= 150)
 	) WITH OIDS;
 
 -- Manager table
@@ -72,7 +72,7 @@ CREATE SEQUENCE mgrseq increment 1 minvalue 1000 maxvalue 9999 start 1000;
 CREATE TABLE tbl_managers (
 	manager_id			integer PRIMARY KEY DEFAULT nextval('mgrseq'),
 	country_id			integer REFERENCES tbl_countries,
-	mgr_birthdate	  date NOT NULL,
+	mgr_birthdate	    date NOT NULL,
 	mgr_firstname		varchar(20) NOT NULL,
 	mgr_lastname		varchar(30) NOT NULL,
 	mgr_nickname		varchar(30) NULL
@@ -126,25 +126,25 @@ CREATE TABLE tbl_rounds (
 CREATE SEQUENCE teamseq increment 1 minvalue 10000 maxvalue 99999 start 10000;
 CREATE TABLE tbl_teams (
 	team_id 	integer PRIMARY KEY DEFAULT nextval('teamseq'),
-  country_id  integer REFERENCES tbl_countries,
-	tm_name		varchar(50) NOT NULL
+    country_id  integer REFERENCES tbl_countries,
+	tm_name	    varchar(50) NOT NULL
 	) WITH OIDS;		
 	
 -- Venues table
 CREATE SEQUENCE venueseq increment 1 minvalue 1000 maxvalue 9999 start 1000;
 CREATE TABLE tbl_venues (
-	venue_id			integer PRIMARY KEY DEFAULT nextval('venueseq'),
-	team_id				integer REFERENCES tbl_teams,
+	venue_id		integer PRIMARY KEY DEFAULT nextval('venueseq'),
+	team_id			integer REFERENCES tbl_teams,
 	country_id		integer REFERENCES tbl_countries,
 	timezone_id		integer REFERENCES tbl_timezones,
-	ven_city			varchar(40) NOT NULL,
-	ven_name			varchar(40) NOT NULL,
-	ven_altitude		numeric(4,0) DEFAULT 0 CHECK (ven_altitude >= -200
-											AND ven_altitude <= 4500),
-	ven_latitude		numeric(8,6) DEFAULT 0.000000 CHECK (ven_latitude >= -90.000000
-											AND ven_latitude <=  90.000000),
-	ven_longitude		numeric(9,6) DEFAULT 0.000000 CHECK (ven_longitude >= -180.000000
-											AND ven_longitude <=  180.000000)
+	ven_city		varchar(40) NOT NULL,
+	ven_name		varchar(40) NOT NULL,
+	ven_altitude	numeric(4,0) DEFAULT 0 CHECK (ven_altitude >= -200
+								 AND ven_altitude <= 4500),
+	ven_latitude	numeric(8,6) DEFAULT 0.000000 CHECK (ven_latitude >= -90.000000
+								 AND ven_latitude <=  90.000000),
+	ven_longitude	numeric(9,6) DEFAULT 0.000000 CHECK (ven_longitude >= -180.000000
+								 AND ven_longitude <=  180.000000)
 	) WITH OIDS;
 
 -- Venue surface/dimensions/capacity historical tracking table
@@ -154,8 +154,8 @@ CREATE TABLE tbl_venuehistory (
     venue_id            integer REFERENCES tbl_venues,
     venuehist_date      date,
     venuesurface_id     integer REFERENCES tbl_venuesurfaces,
-    venue_length				integer DEFAULT 105 CHECK (venue_length >= 90 AND venue_length <= 120),
-    venue_width					integer DEFAULT 68 CHECK (venue_width >= 45 AND venue_width <= 90),
+    venue_length		integer DEFAULT 105 CHECK (venue_length >= 90 AND venue_length <= 120),
+    venue_width			integer DEFAULT 68 CHECK (venue_width >= 45 AND venue_width <= 90),
     venuehist_capacity  integer DEFAULT 0 CHECK (venuehist_capacity >= 0),
     venuehist_seats     integer DEFAULT 0 CHECK (venuehist_seats >= 0)
     ) WITH OIDS;
@@ -177,13 +177,13 @@ CREATE TABLE tbl_matches (
 -- Lineup table
 CREATE SEQUENCE lineupseq increment 1 minvalue 1000000 maxvalue 9999999 start 1000000;
 CREATE TABLE tbl_lineups (
-	lineup_id				integer PRIMARY KEY DEFAULT nextval('lineupseq'),
-	match_id				integer REFERENCES tbl_matches,
-	team_id					integer REFERENCES tbl_teams,
-	player_id				integer REFERENCES tbl_players,
-	position_id			integer REFERENCES tbl_positions,
-	lp_starting			boolean DEFAULT FALSE,
-	lp_captain			boolean DEFAULT FALSE
+	lineup_id		integer PRIMARY KEY DEFAULT nextval('lineupseq'),
+	match_id		integer REFERENCES tbl_matches,
+	team_id			integer REFERENCES tbl_teams,
+	player_id		integer REFERENCES tbl_players,
+	position_id		integer REFERENCES tbl_positions,
+	lp_starting		boolean DEFAULT FALSE,
+	lp_captain		boolean DEFAULT FALSE
 	) WITH OIDS;
 		
 -- ---------------------------------------
@@ -205,13 +205,13 @@ CREATE TABLE tbl_awayteams (
 
 -- Home/away managers	
 CREATE TABLE tbl_homemanagers (
-	match_id		integer REFERENCES tbl_matches,
+	match_id	integer REFERENCES tbl_matches,
 	manager_id	integer	REFERENCES tbl_managers,
 	PRIMARY KEY (match_id, manager_id)
 	) WITH OIDS;
 	
 CREATE TABLE tbl_awaymanagers (
-	match_id		integer REFERENCES tbl_matches,
+	match_id	integer REFERENCES tbl_matches,
 	manager_id	integer	REFERENCES tbl_managers,
 	PRIMARY KEY (match_id, manager_id)
 	) WITH OIDS;	
@@ -223,17 +223,17 @@ CREATE TABLE tbl_awaymanagers (
 -- Environment main table
 CREATE SEQUENCE enviroseq increment 1 minvalue 1000000 maxvalue 9999999 start 1000000;
 CREATE TABLE tbl_environments (
-	enviro_id					integer PRIMARY KEY DEFAULT nextval('enviroseq'),
-	match_id					integer REFERENCES tbl_matches,
+	enviro_id			integer PRIMARY KEY DEFAULT nextval('enviroseq'),
+	match_id			integer REFERENCES tbl_matches,
 	env_kickofftime		time,
 	env_temperature 	numeric(4,2) CHECK (env_temperature >= -15.0 
-																		AND env_temperature <= 45.0)
+						        		AND env_temperature <= 45.0)
 	) WITH OIDS;
 
 -- Weather conditions table
 CREATE SEQUENCE wxseq increment 1 minvalue 10 maxvalue 99 start 10;
 CREATE TABLE tbl_weather (
-	weather_id				integer PRIMARY KEY DEFAULT nextval('wxseq'),
+	weather_id			integer PRIMARY KEY DEFAULT nextval('wxseq'),
 	wx_conditiondesc	varchar(40) NOT NULL
 	) WITH OIDS;
 
@@ -243,21 +243,21 @@ CREATE TABLE tbl_weather (
 
 -- Kickoff weather condition table
 CREATE TABLE tbl_weatherkickoff (
-	enviro_id			integer REFERENCES tbl_environments,
+	enviro_id		integer REFERENCES tbl_environments,
 	weather_id		integer REFERENCES tbl_weather,
 	PRIMARY KEY (enviro_id, weather_id)
 	) WITH OIDS;
 
 -- Halftime weather condition table
 CREATE TABLE tbl_weatherhalftime (
-	enviro_id			integer REFERENCES tbl_environments,
+	enviro_id		integer REFERENCES tbl_environments,
 	weather_id		integer REFERENCES tbl_weather,
 	PRIMARY KEY (enviro_id, weather_id)
 	) WITH OIDS;
 
 -- Fulltime weather condition table
 CREATE TABLE tbl_weatherfulltime (
-	enviro_id			integer REFERENCES tbl_environments,
+	enviro_id		integer REFERENCES tbl_environments,
 	weather_id		integer REFERENCES tbl_weather,
 	PRIMARY KEY (enviro_id, weather_id)
 	) WITH OIDS;
@@ -270,26 +270,26 @@ CREATE TABLE tbl_weatherfulltime (
 CREATE SEQUENCE gstkseq increment 1 minvalue 1 maxvalue 9 start 1;
 CREATE TABLE tbl_goalstrikes (
 	gtstype_id		integer PRIMARY KEY DEFAULT nextval('gstkseq'),
-	gts_desc			varchar(15) NOT NULL
+	gts_desc		varchar(15) NOT NULL
 	) WITH OIDS;
 	
 -- Goal events table
 CREATE SEQUENCE gevtseq increment 1 minvalue 10 maxvalue 99 start 10;
 CREATE TABLE tbl_goalevents (
 	gtetype_id		integer PRIMARY KEY DEFAULT nextval('gevtseq'),
-	gte_desc			varchar(30) NOT NULL
+	gte_desc		varchar(30) NOT NULL
 	) WITH OIDS;
 
 -- Goals table	
 CREATE SEQUENCE goalseq increment 1 minvalue 100000 maxvalue 999999 start 100000;
 CREATE TABLE tbl_goals (
-	goal_id				integer PRIMARY KEY DEFAULT nextval('goalseq'),
-	team_id				integer REFERENCES tbl_teams,
-	lineup_id			integer REFERENCES tbl_lineups,
+	goal_id			integer PRIMARY KEY DEFAULT nextval('goalseq'),
+	team_id			integer REFERENCES tbl_teams,
+	lineup_id		integer REFERENCES tbl_lineups,
 	gtstype_id		integer REFERENCES tbl_goalstrikes,
 	gtetype_id		integer REFERENCES tbl_goalevents,
-	gls_time			integer NOT NULL CHECK (gls_time > 0 AND gls_time <= 90),
-	gls_stime			integer DEFAULT 0 CHECK (gls_stime >= 0 AND gls_stime <= 15)
+	gls_time		integer NOT NULL CHECK (gls_time > 0 AND gls_time <= 90),
+	gls_stime		integer DEFAULT 0 CHECK (gls_stime >= 0 AND gls_stime <= 15)
 	) WITH OIDS;
 	
 -- Cards table
@@ -302,7 +302,7 @@ CREATE TABLE tbl_cards (
 -- Fouls table
 CREATE SEQUENCE foulseq increment 1 minvalue 10 maxvalue 99 start 10;
 CREATE TABLE tbl_fouls (
-	foul_id			integer PRIMARY KEY DEFAULT nextval('foulseq'),
+	foul_id		integer PRIMARY KEY DEFAULT nextval('foulseq'),
 	foul_desc 	varchar(40) NOT NULL
 	) WITH OIDS;
 
@@ -310,10 +310,10 @@ CREATE TABLE tbl_fouls (
 CREATE SEQUENCE offseq increment 1 minvalue 100000 maxvalue 999999 start 100000;
 CREATE TABLE tbl_offenses (
 	offense_id		integer PRIMARY KEY DEFAULT nextval('offseq'),
-	lineup_id			integer REFERENCES tbl_lineups,
-	foul_id				integer REFERENCES tbl_fouls,
-	card_id				integer REFERENCES tbl_cards,
-	ofns_time			integer NOT NULL CHECK (ofns_time > 0 AND ofns_time <= 90),
+	lineup_id		integer REFERENCES tbl_lineups,
+	foul_id			integer REFERENCES tbl_fouls,
+	card_id			integer REFERENCES tbl_cards,
+	ofns_time		integer NOT NULL CHECK (ofns_time > 0 AND ofns_time <= 90),
 	ofns_stime		integer DEFAULT 0 CHECK (ofns_stime >= 0 AND ofns_stime <= 15)
 	) WITH OIDS;
 
@@ -321,25 +321,25 @@ CREATE TABLE tbl_offenses (
 CREATE SEQUENCE poseq increment 1 minvalue 1 maxvalue 9 start 1;
 CREATE TABLE tbl_penoutcomes (
 	penoutcome_id		integer PRIMARY KEY DEFAULT nextval('poseq'),
-	po_desc					varchar(15) NOT NULL
+	po_desc				varchar(15) NOT NULL
 	) WITH OIDS;
 
 -- Penalties table
 CREATE SEQUENCE penseq increment 1 minvalue 10000 maxvalue 99999 start 10000;
 CREATE TABLE tbl_penalties (
 	penalty_id		integer PRIMARY KEY DEFAULT nextval('penseq'),
-	lineup_id			integer REFERENCES tbl_lineups,
-	foul_id				integer REFERENCES tbl_fouls,
+	lineup_id		integer REFERENCES tbl_lineups,
+	foul_id			integer REFERENCES tbl_fouls,
 	penoutcome_id	integer REFERENCES tbl_penoutcomes,
-	pen_time			integer NOT NULL CHECK (pen_time > 0 AND pen_time <= 90),
-	pen_stime			integer DEFAULT 0 CHECK (pen_stime >= 0 AND pen_stime <= 15)
+	pen_time		integer NOT NULL CHECK (pen_time > 0 AND pen_time <= 90),
+	pen_stime		integer DEFAULT 0 CHECK (pen_stime >= 0 AND pen_stime <= 15)
 	) WITH OIDS;
 	
 -- Substitutions table
 CREATE SEQUENCE subsseq increment 1 minvalue 100000 maxvalue 999999 start 100000;
 CREATE TABLE tbl_substitutions (
-	subs_id				integer PRIMARY KEY DEFAULT nextval('subsseq'),
-	subs_time			integer NOT NULL CHECK (subs_time > 0 AND subs_time <= 90),
+	subs_id			integer PRIMARY KEY DEFAULT nextval('subsseq'),
+	subs_time		integer NOT NULL CHECK (subs_time > 0 AND subs_time <= 90),
 	subs_stime		integer DEFAULT 0 CHECK (subs_stime >= 0 AND subs_stime <= 15)
 	) WITH OIDS;
 
@@ -358,9 +358,9 @@ CREATE TABLE tbl_outsubstitutions (
 -- Switch Positions table
 CREATE SEQUENCE switchseq increment 1 minvalue 100000 maxvalue 999999 start 100000;
 CREATE TABLE tbl_switchpositions (
-	switch_id						integer PRIMARY KEY DEFAULT nextval('switchseq'),
-	lineup_id						integer REFERENCES tbl_lineups,
-	switchposition_id	  integer REFERENCES tbl_positions,
-	switch_time					integer NOT NULL CHECK (switch_time > 0 AND switch_time < 90),
-	switch_stime				integer DEFAULT 0 CHECK (switch_stime >= 0 AND switch_stime <= 15)
+	switch_id			integer PRIMARY KEY DEFAULT nextval('switchseq'),
+	lineup_id			integer REFERENCES tbl_lineups,
+	switchposition_id	integer REFERENCES tbl_positions,
+	switch_time			integer NOT NULL CHECK (switch_time > 0 AND switch_time < 90),
+	switch_stime		integer DEFAULT 0 CHECK (switch_stime >= 0 AND switch_stime <= 15)
 	) WITH OIDS;
