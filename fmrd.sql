@@ -142,6 +142,13 @@ CREATE TABLE tbl_rounds (
 	round_id	integer PRIMARY KEY DEFAULT nextval('roundseq'),
 	round_desc 	varchar(20) NOT NULL
 	) WITH OIDS;
+	
+-- Matchdays table
+CREATE SEQUENCE matchdayseq increment 1 minvalue 1 maxvalue 9 start 1;
+CREATE TABLE tbl_matchdays (
+    matchday_id integer PRIMARY KEY DEFAULT nextval('matchdaysseq'),
+    round_desc  varchar(12) NOT NULL
+    ) WITH OIDS;	
 
 -- Teams table	
 CREATE SEQUENCE teamseq increment 1 minvalue 10000 maxvalue 99999 start 10000;
