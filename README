@@ -1,11 +1,11 @@
-FMRD-SQL Version 1.1.2
+FMRD-SQL Version 1.3.0
 ======================
 
 This is the SQL implementation of the Football Match Result Database.
 
 This implementation supports a data model for clubs participating in
-league competitions.  There are four categories under which the tables
-are classified:
+league, knockout, or hybrid (league+knockout) competitions.  There 
+are four categories under which the tables are classified:
 
 *Overview*: High-level data about the football competition
 *Personnel*: Participants and officials in the football match
@@ -41,13 +41,19 @@ Penalties
 Offenses
 Substitutions
 SwitchPositions
+PenaltyShootouts
+PenShootoutOpeners
 
 The following validation tables are implemented:
 
 Overview
 --------
 FieldSurfaces
+Phases
+Groups
 Rounds
+KnockoutRounds
+Matchdays
 TimeZones
 WeatherConditions
 
@@ -61,6 +67,9 @@ Positions (composite)
 
 Match
 -----
+LeagueMatches
+GroupMatches
+KnockoutMatches
 HomeTeams
 AwayTeams
 HomeManagers
