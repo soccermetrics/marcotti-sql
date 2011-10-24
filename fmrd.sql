@@ -163,15 +163,15 @@ CREATE TABLE tbl_venuehistory (
 -- Match table
 CREATE SEQUENCE matchseq increment 1 minvalue 1000000 maxvalue 9999999 start 1000000;
 CREATE TABLE tbl_matches (
-	match_id							integer PRIMARY KEY DEFAULT nextval('matchseq'),
-	match_date						date,
+	match_id				integer PRIMARY KEY DEFAULT nextval('matchseq'),
+	match_date				date,
 	match_firsthalftime	 	integer DEFAULT 45 CHECK (match_firsthalftime > 0),
 	match_secondhalftime 	integer DEFAULT 45 CHECK (match_secondhalftime >= 0),
-	match_attendance			integer DEFAULT 0 CHECK (match_attendance >= 0),
-	competition_id				integer REFERENCES tbl_competitions,
-	round_id							integer REFERENCES tbl_rounds,
-	venue_id							integer REFERENCES tbl_venues,
-	referee_id						integer REFERENCES tbl_referees
+	match_attendance		integer DEFAULT 0 CHECK (match_attendance >= 0),
+	competition_id			integer REFERENCES tbl_competitions,
+	round_id				integer REFERENCES tbl_rounds,
+	venue_id				integer REFERENCES tbl_venues,
+	referee_id				integer REFERENCES tbl_referees
 	) WITH OIDS;
 	
 -- Lineup table
