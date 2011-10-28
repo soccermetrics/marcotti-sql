@@ -42,14 +42,20 @@ do {
     }
 } until ($attempt == 3) || $success;
 print("\nDatabase authentication confirmed.\n");
-print("Enter number of rounds: ");
+print("Enter maximum number of league or shootout rounds: ");
 chomp(my $roundnum = <STDIN>);
+print("[A]lpha or [N]umeric group names: ");
+chomp(my $groupchar = <STDIN>);
 
 # Populate database tables
 load_confederations();
 load_countries();
 load_timezones();
 load_rounds($roundnum);
+load_knockout_rounds();
+load_matchdays();
+load_phases();
+load_groups($groupchar);
 load_surfaces();
 load_penoutcomes();
 load_fieldpos();
@@ -146,6 +152,54 @@ sub load_timezones {
 	close(LIST);	
 }
 
+# load competition phases table
+sub load_phases {
+	# open list file
+	open(LIST,"lists/phase-list.dat");
+
+	# prepare
+	$sth = $dbh->prepare("INSERT INTO tbl_phases(phase_desc) VALUES (?)");
+	
+	# execute
+	while (<LIST>) {
+		chomp;
+		$sth->execute($_);
+	}
+	
+	# commit
+	$dbh->commit();
+	
+	# close list file
+	close(LIST);		
+}
+
+# load groups table
+sub load_groups {
+	$groupkey = $_[0];	# get group identifier
+	
+	if (uc($groupkey) eq 'A') {
+	    open(LIST,"lists/group-letters-list.dat");
+    }
+    elsif (uc($groupkey) eq 'N') {
+        open(LIST,"lists/group-numbers-list.dat");
+    }
+    else {
+        print "ERROR: Identifier must be 'A' or 'N'.  Groups table not populated.\n";
+        return;
+    }
+	
+	# prepare
+	$sth = $dbh->prepare("INSERT INTO tbl_groups(group_desc) VALUES (?)");
+	
+	# execute
+	while (<LIST>) {
+		chomp;
+		$sth->execute($_);
+	}
+	
+	# commit
+	$dbh->commit();
+}
 
 # load rounds table
 sub load_rounds {
@@ -160,6 +214,48 @@ sub load_rounds {
 	}
 	# commit
 	$dbh->commit();
+}
+
+# load knockout rounds table
+sub load_knockout_rounds {
+	# open list file
+	open(LIST,"lists/knockoutround-list.dat");
+
+	# prepare
+	$sth = $dbh->prepare("INSERT INTO tbl_knockoutrounds(koround_desc) VALUES (?)");
+	
+	# execute
+	while (<LIST>) {
+		chomp;
+		$sth->execute($_);
+	}
+	
+	# commit
+	$dbh->commit();
+	
+	# close list file
+	close(LIST);		
+}
+
+# load knockout round matchday table
+sub load_matchdays {
+	# open list file
+	open(LIST,"lists/matchday-list.dat");
+
+	# prepare
+	$sth = $dbh->prepare("INSERT INTO tbl_matchdays(matchday_desc) VALUES (?)");
+	
+	# execute
+	while (<LIST>) {
+		chomp;
+		$sth->execute($_);
+	}
+	
+	# commit
+	$dbh->commit();
+	
+	# close list file
+	close(LIST);		
 }
 
 # load venue playing surfaces table
