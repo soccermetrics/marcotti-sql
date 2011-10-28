@@ -1,7 +1,7 @@
 -- fmrd-views.sql: View schema for Football Match Result Database
--- Version: 1.0.0
+-- Version: 1.3.0
 -- Author: Howard Hamilton
--- Date: 2010-08-05
+-- Date: 2011-10-28
 
 -- -------------------------------------------------
 -- CountriesList View
@@ -15,7 +15,7 @@ CREATE VIEW countries_list AS
 	WHERE tbl_countries.confed_id = tbl_confederations.confed_id;
 
 -- -------------------------------------------------
--- CountriesList View
+-- TeamsList View
 -- -------------------------------------------------
 
 CREATE VIEW teams_list AS
@@ -176,20 +176,75 @@ CREATE VIEW venuehistory_list AS
 CREATE VIEW match_list AS
 	SELECT tbl_matches.match_id,
 				 tbl_competitions.competition_id,
-				 tbl_rounds.round_id,
 				 comp_name AS competition,
-				 round_desc AS matchday,
+				 match_date AS date,
+				 phase_desc AS phase,
 				 hometeam_list.team || ' vs ' || awayteam_list.team AS matchup,
 				 venue,
 				 full_name AS referee
-	FROM tbl_matches, tbl_competitions, tbl_rounds, hometeam_list, awayteam_list, venue_list, referees_list
+	FROM tbl_matches, tbl_competitions, tbl_phases, hometeam_list, awayteam_list, venue_list, referees_list
 	WHERE hometeam_list.match_id = tbl_matches.match_id
 		AND awayteam_list.match_id = tbl_matches.match_id
 		AND tbl_competitions.competition_id = tbl_matches.competition_id
-		AND tbl_rounds.round_id = tbl_matches.round_id
+		AND tbl_phases.phase_id = tbl_matches.phase_id
 		AND venue_list.venue_id = tbl_matches.venue_id
 		AND referees_list.referee_id = tbl_matches.referee_id;
 		
+-- -------------------------------------------------
+-- LeagueMatchList View
+-- -------------------------------------------------
+
+CREATE VIEW league_match_list AS
+	SELECT match_id,
+				 competition,
+				 date,
+				 round_desc AS round,
+				 matchup,
+				 venue,
+				 referee
+	FROM match_list, tbl_rounds, tbl_leaguematches
+	WHERE match_list.match_id = tbl_leaguematches.match_id
+	  AND tbl_leaguematches.round_id = tbl_rounds.round_id
+	  AND match_list.phase = 'League';
+	  
+-- -------------------------------------------------
+-- GroupMatchList View
+-- -------------------------------------------------
+
+CREATE VIEW group_match_list AS
+	SELECT match_id,
+				 competition,
+				 date,
+				 group_desc AS group,
+				 round_desc AS round,
+				 matchup,
+				 venue,
+				 referee
+	FROM match_list, tbl_rounds, tbl_groups, tbl_groupmatches
+	WHERE match_list.match_id = tbl_groupmatches.match_id
+	  AND tbl_groupmatches.group_id = tbl_groups.group_id
+	  AND tbl_groupmatches.round_id = tbl_rounds.round_id
+	  AND match_list.phase = 'Group';
+	  
+-- -------------------------------------------------
+-- KnockoutMatchList View
+-- -------------------------------------------------
+
+CREATE VIEW knockout_match_list AS
+	SELECT match_id,
+				 competition,
+				 date,
+				 koround_desc AS round,
+				 matchday_desc AS game,
+				 matchup,
+				 venue,
+				 referee
+	FROM match_list, tbl_knockoutrounds, tbl_matchdays, tbl_knockoutmatches
+	WHERE match_list.match_id = tbl_knockoutmatches.match_id
+	  AND tbl_knockoutmatches.koround_id = tbl_knockoutrounds.koround_id
+	  AND tbl_knockoutmatches.matchday_id = tbl_matchdays.matchday_id
+	  AND match_list.phase = 'Knockout';
+	  
 -- -------------------------------------------------
 -- Weather Conditions Views
 -- -------------------------------------------------
@@ -266,9 +321,10 @@ CREATE VIEW goals_list AS
 	FROM tbl_teams, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals
 	WHERE match_list.match_id IN (SELECT match_id FROM tbl_lineups)
 		AND tbl_goals.lineup_id = lineup_list.lineup_id
-		AND tbl_goals.team_id = tbl_teams.team_id
 		AND tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id
-		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id;
+		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id
+	  AND tbl_goals.team_id IN (SELECT team_id FROM tbl_lineups
+	  													WHERE tbl_lineups.lineup_id = lineup_list.lineup_id);
 
 -- -------------------------------------------------
 -- OwnGoalsList View
@@ -344,7 +400,7 @@ CREATE VIEW expulsions_list AS
 	WHERE tbl_offenses.lineup_id = lineup_list.lineup_id
 		AND tbl_offenses.foul_id = tbl_fouls.foul_id
 		AND tbl_offenses.card_id IN (SELECT card_id FROM tbl_cards
-				WHERE card_type = 'Yellow/Red' OR card_type = 'Red');
+				WHERE card_type IN ('Yellow/Red','Red');
 
 -- -------------------------------------------------
 -- SubstitutionsList View
@@ -378,6 +434,10 @@ CREATE VIEW subs_list AS
 											WHERE lineup_list.lineup_id = tbl_outsubstitutions.lineup_id) 
 		AND (tbl_substitutions.subs_id = tbl_insubstitutions.subs_id 
 				 AND tbl_substitutions.subs_id = tbl_outsubstitutions.subs_id);
+	
+-- -------------------------------------------------
+-- SwitchPositionsList View
+-- -------------------------------------------------
 	
 CREATE VIEW switchpos_list AS
 	SELECT switch_id,
