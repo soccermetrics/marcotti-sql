@@ -146,8 +146,8 @@ CREATE TABLE tbl_rounds (
 -- Matchdays table
 CREATE SEQUENCE matchdayseq increment 1 minvalue 1 maxvalue 9 start 1;
 CREATE TABLE tbl_matchdays (
-    matchday_id integer PRIMARY KEY DEFAULT nextval('matchdaysseq'),
-    round_desc  varchar(12) NOT NULL
+    matchday_id    integer PRIMARY KEY DEFAULT nextval('matchdaysseq'),
+    matchday_desc  varchar(12) NOT NULL
     ) WITH OIDS;	
 
 -- Teams table	
@@ -199,6 +199,7 @@ CREATE TABLE tbl_matches (
 	match_secondovertime    integer DEFAULT 0 CHECK (match_secondovertime >= 0),
 	match_attendance		integer DEFAULT 0 CHECK (match_attendance >= 0),
 	competition_id			integer REFERENCES tbl_competitions,
+	phase_id                integer REFERENCES tbl_phases,
 	venue_id				integer REFERENCES tbl_venues,
 	referee_id				integer REFERENCES tbl_referees
 	) WITH OIDS;
