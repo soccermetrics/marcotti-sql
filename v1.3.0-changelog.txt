@@ -1,5 +1,5 @@
-FMRD-SQL Version 1.3.0
-======================
+FMRD-SQL Version 1.3.0a
+=======================
 
 Changes relative to Version 1.1.2
 ---------------------------------
@@ -19,3 +19,11 @@ Changes relative to Version 1.1.2
     - Knockout Matches
 * Removed Rounds field from Matches table
 * Added extra-time fields in Matches table
+
+Changes relative to Version 1.3.0
+---------------------------------
+* Removed Rounds field from MatchList view, added Phase field
+* Added LeagueMatchList view
+* Added GroupMatchList view
+* Added KnockoutMatchList view
+* Added CountriesList view
