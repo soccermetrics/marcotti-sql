@@ -415,13 +415,15 @@ CREATE TABLE tbl_substitutions (
 -- In Substitutions table
 CREATE TABLE tbl_insubstitutions (
 	subs_id			integer REFERENCES tbl_substitutions,
-	lineup_id		integer	REFERENCES tbl_lineups
+	lineup_id		integer	REFERENCES tbl_lineups,
+	PRIMARY KEY (subs_id, lineup_id)
 	) WITH OIDS;
 
 -- Out Substitutions table
 CREATE TABLE tbl_outsubstitutions (
 	subs_id			integer REFERENCES tbl_substitutions,
-	lineup_id		integer	REFERENCES tbl_lineups
+	lineup_id		integer	REFERENCES tbl_lineups,
+	PRIMARY KEY (subs_id, lineup_id)
 	) WITH OIDS;
 
 -- Switch Positions table
