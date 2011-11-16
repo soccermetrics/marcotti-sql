@@ -341,7 +341,7 @@ CREATE TABLE tbl_goals (
 	lineup_id		integer REFERENCES tbl_lineups,
 	gtstype_id		integer REFERENCES tbl_goalstrikes,
 	gtetype_id		integer REFERENCES tbl_goalevents,
-	gls_time		integer NOT NULL CHECK (gls_time > 0 AND gls_time <= 90),
+	gls_time		integer NOT NULL CHECK (gls_time > 0 AND gls_time <= 120),
 	gls_stime		integer DEFAULT 0 CHECK (gls_stime >= 0 AND gls_stime <= 15)
 	) WITH OIDS;
 	
@@ -366,7 +366,7 @@ CREATE TABLE tbl_offenses (
 	lineup_id		integer REFERENCES tbl_lineups,
 	foul_id			integer REFERENCES tbl_fouls,
 	card_id			integer REFERENCES tbl_cards,
-	ofns_time		integer NOT NULL CHECK (ofns_time > 0 AND ofns_time <= 90),
+	ofns_time		integer NOT NULL CHECK (ofns_time > 0 AND ofns_time <= 120),
 	ofns_stime		integer DEFAULT 0 CHECK (ofns_stime >= 0 AND ofns_stime <= 15)
 	) WITH OIDS;
 
@@ -384,7 +384,7 @@ CREATE TABLE tbl_penalties (
 	lineup_id		integer REFERENCES tbl_lineups,
 	foul_id			integer REFERENCES tbl_fouls,
 	penoutcome_id	integer REFERENCES tbl_penoutcomes,
-	pen_time		integer NOT NULL CHECK (pen_time > 0 AND pen_time <= 90),
+	pen_time		integer NOT NULL CHECK (pen_time > 0 AND pen_time <= 120),
 	pen_stime		integer DEFAULT 0 CHECK (pen_stime >= 0 AND pen_stime <= 15)
 	) WITH OIDS;
 	
@@ -409,7 +409,7 @@ CREATE TABLE tbl_penshootoutopeners (
 CREATE SEQUENCE subsseq increment 1 minvalue 100000 maxvalue 999999 start 100000;
 CREATE TABLE tbl_substitutions (
 	subs_id			integer PRIMARY KEY DEFAULT nextval('subsseq'),
-	subs_time		integer NOT NULL CHECK (subs_time > 0 AND subs_time <= 90),
+	subs_time		integer NOT NULL CHECK (subs_time > 0 AND subs_time <= 120),
 	subs_stime		integer DEFAULT 0 CHECK (subs_stime >= 0 AND subs_stime <= 15)
 	) WITH OIDS;
 
@@ -431,6 +431,6 @@ CREATE TABLE tbl_switchpositions (
 	switch_id			integer PRIMARY KEY DEFAULT nextval('switchseq'),
 	lineup_id			integer REFERENCES tbl_lineups,
 	switchposition_id	integer REFERENCES tbl_positions,
-	switch_time			integer NOT NULL CHECK (switch_time > 0 AND switch_time < 90),
+	switch_time			integer NOT NULL CHECK (switch_time > 0 AND switch_time < 120),
 	switch_stime		integer DEFAULT 0 CHECK (switch_stime >= 0 AND switch_stime <= 15)
 	) WITH OIDS;
