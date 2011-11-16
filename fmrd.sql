@@ -398,11 +398,10 @@ CREATE TABLE tbl_penaltyshootouts (
     ) WITH OIDS;
     
 -- Penalty Shootout opener table
-CREATE SEQUENCE penopenerseq increment 1 minvalue 10000 maxvalue 99999 start 10000;
 CREATE TABLE tbl_penshootoutopeners (
-    opener_id   integer PRIMARY KEY DEFAULT nextval('penopenerseq'),
     match_id    integer REFERENCES tbl_matches,
-    team_id     integer REFERENCES tbl_teams
+    team_id     integer REFERENCES tbl_teams,
+    PRIMARY KEY (match_id, team_id)
     ) WITH OIDS;
     
 -- Substitutions table
