@@ -1,4 +1,4 @@
-FMRD-SQL Version 1.3.0a
+FMRD-SQL Version 1.3.0b
 =======================
 
 Changes relative to Version 1.1.2
@@ -27,3 +27,10 @@ Changes relative to Version 1.3.0
 * Added GroupMatchList view
 * Added KnockoutMatchList view
 * Added CountriesList view
+
+Changes relative to Version 1.3.0a
+----------------------------------
+* Set maximum value of match time field to 120 minutes
+  (Goals, Offenses, Penalties, Substitutions, SwitchPositions)
+* Convert ShootoutOpeners table to linking table
+* Create composite primary key for In/OutSubstitutions tables
