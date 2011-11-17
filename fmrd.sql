@@ -129,6 +129,13 @@ CREATE TABLE tbl_groups (
     group_desc  varchar(2) NOT NULL
     ) WITH OIDS;
     
+-- Group Rounds table
+CREATE SEQUENCE grproundseq increment 1 minvalue 10 maxvalue 99 start 10;
+CREATE TABLE tbl_grouprounds (
+    grpround_id      integer PRIMARY KEY DEFAULT nextval('grproundseq'),
+    grpround_desc    varchar(40) NOT NULL
+    ) WITH OIDS;
+    
 -- Knockout Rounds table    
 CREATE SEQUENCE koroundseq increment 1 minvalue 10 maxvalue 99 start 10;
 CREATE TABLE tbl_knockoutrounds (
@@ -217,7 +224,7 @@ CREATE TABLE tbl_lineups (
 	) WITH OIDS;
 		
 -- ---------------------------------------
--- Linking tables	to Match Overview tables
+-- Linking tables to Match Overview tables
 -- ---------------------------------------
 
 -- League matches
