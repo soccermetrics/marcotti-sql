@@ -215,13 +215,15 @@ CREATE VIEW group_match_list AS
 	SELECT match_id,
 				 competition,
 				 date,
-				 group_desc AS group,
-				 round_desc AS round,
+				 grpround_desc AS round,
+				 group_desc AS group_name,
+				 round_desc AS matchday,
 				 matchup,
 				 venue,
 				 referee
-	FROM match_list, tbl_rounds, tbl_groups, tbl_groupmatches
-	WHERE match_list.match_id = tbl_groupmatches.match_id
+	FROM match_list, tbl_rounds, tbl_groups, tbl_grouprounds, tbl_groupmatches
+	WHERE tbl_groupmatches.match_id = match_list.match_id
+	  AND tbl_groupmatches.grpround_id = tbl_grouprounds.grpround_id
 	  AND tbl_groupmatches.group_id = tbl_groups.group_id
 	  AND tbl_groupmatches.round_id = tbl_rounds.round_id
 	  AND match_list.phase = 'Group';
@@ -324,7 +326,7 @@ CREATE VIEW goals_list AS
 		AND tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id
 		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id
 	  AND tbl_goals.team_id IN (SELECT team_id FROM tbl_lineups
-	  													WHERE tbl_lineups.lineup_id = lineup_list.lineup_id);
+	  							WHERE tbl_lineups.lineup_id = lineup_list.lineup_id);
 
 -- -------------------------------------------------
 -- OwnGoalsList View
@@ -346,7 +348,7 @@ CREATE VIEW owngoals_list AS
 		AND tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id
 		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id	  
 	  AND tbl_goals.team_id NOT IN (SELECT team_id FROM tbl_lineups
-	  														  WHERE tbl_lineups.lineup_id = lineup_list.lineup_id);
+	  								WHERE tbl_lineups.lineup_id = lineup_list.lineup_id);
 
 -- -------------------------------------------------
 -- PenaltiesList View
@@ -407,14 +409,12 @@ CREATE VIEW expulsions_list AS
 -- -------------------------------------------------
 
 CREATE VIEW insub_list AS
-	SELECT subs_id,
-				 player
+	SELECT subs_id, player
 	FROM tbl_insubstitutions, lineup_list
 	WHERE tbl_insubstitutions.lineup_id = lineup_list.lineup_id;
 	
 CREATE VIEW outsub_list AS
-	SELECT subs_id,
-				 player
+	SELECT subs_id, player
 	FROM tbl_outsubstitutions, lineup_list
 	WHERE tbl_outsubstitutions.lineup_id = lineup_list.lineup_id;
 
@@ -429,11 +429,11 @@ CREATE VIEW subs_list AS
 			 end AS time 
 	FROM lineup_list a1, lineup_list a2, tbl_substitutions, tbl_insubstitutions, tbl_outsubstitutions 
 	WHERE a1.player in (SELECT player FROM lineup_list 
-											WHERE lineup_list.lineup_id = tbl_insubstitutions.lineup_id) 
+						WHERE lineup_list.lineup_id = tbl_insubstitutions.lineup_id) 
 		AND a2.player in (SELECT player FROM lineup_list 
-											WHERE lineup_list.lineup_id = tbl_outsubstitutions.lineup_id) 
+						  WHERE lineup_list.lineup_id = tbl_outsubstitutions.lineup_id) 
 		AND (tbl_substitutions.subs_id = tbl_insubstitutions.subs_id 
-				 AND tbl_substitutions.subs_id = tbl_outsubstitutions.subs_id);
+			AND tbl_substitutions.subs_id = tbl_outsubstitutions.subs_id);
 	
 -- -------------------------------------------------
 -- SwitchPositionsList View
