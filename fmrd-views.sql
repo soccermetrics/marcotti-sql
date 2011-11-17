@@ -177,7 +177,7 @@ CREATE VIEW match_list AS
 	SELECT tbl_matches.match_id,
 				 tbl_competitions.competition_id,
 				 comp_name AS competition,
-				 match_date AS date,
+				 match_date,
 				 phase_desc AS phase,
 				 hometeam_list.team || ' vs ' || awayteam_list.team AS matchup,
 				 venue,
@@ -197,7 +197,7 @@ CREATE VIEW match_list AS
 CREATE VIEW league_match_list AS
 	SELECT match_id,
 				 competition,
-				 date,
+				 match_date,
 				 round_desc AS round,
 				 matchup,
 				 venue,
@@ -214,7 +214,7 @@ CREATE VIEW league_match_list AS
 CREATE VIEW group_match_list AS
 	SELECT match_id,
 				 competition,
-				 date,
+				 match_date,
 				 grpround_desc AS round,
 				 group_desc AS group_name,
 				 round_desc AS matchday,
@@ -235,7 +235,7 @@ CREATE VIEW group_match_list AS
 CREATE VIEW knockout_match_list AS
 	SELECT match_id,
 				 competition,
-				 date,
+				 match_date,
 				 koround_desc AS round,
 				 matchday_desc AS game,
 				 matchup,
