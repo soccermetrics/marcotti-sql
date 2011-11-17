@@ -241,7 +241,7 @@ sub load_group_rounds {
 # load knockout rounds table
 sub load_knockout_rounds {
 	# open list file
-	open(LIST,"lists/knockoutround-list.dat");
+	open(LIST,"lists/knockout-round-list.dat");
 
 	# prepare
 	$sth = $dbh->prepare("INSERT INTO tbl_knockoutrounds(koround_desc) VALUES (?)");
