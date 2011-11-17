@@ -52,6 +52,7 @@ load_confederations();
 load_countries();
 load_timezones();
 load_rounds($roundnum);
+load_group_rounds();
 load_knockout_rounds();
 load_matchdays();
 load_phases();
@@ -214,6 +215,27 @@ sub load_rounds {
 	}
 	# commit
 	$dbh->commit();
+}
+
+# load group rounds table
+sub load_group_rounds {
+	# open list file
+	open(LIST,"lists/group-round-list.dat");
+
+	# prepare
+	$sth = $dbh->prepare("INSERT INTO tbl_grouprounds(grpround_desc) VALUES (?)");
+	
+	# execute
+	while (<LIST>) {
+		chomp;
+		$sth->execute($_);
+	}
+	
+	# commit
+	$dbh->commit();
+	
+	# close list file
+	close(LIST);		
 }
 
 # load knockout rounds table
