@@ -466,8 +466,8 @@ CREATE VIEW shootoutopeners_list AS
             matchup,
             tm_name AS team_first
     FROM knockout_match_list, tbl_teams, tbl_penshootoutopeners
-    WHERE tbl_shootoutopeners.match_id = knockout_match_list.match_id
-        AND tbl_shootoutopeners.team_id = tbl_teams.team_id;
+    WHERE tbl_penshootoutopeners.match_id = knockout_match_list.match_id
+        AND tbl_penshootoutopeners.team_id = tbl_teams.team_id;
         
 -- -------------------------------------------------
 -- ShootoutList View
