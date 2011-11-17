@@ -237,9 +237,10 @@ CREATE TABLE tbl_leaguematches (
 -- Group matches
 CREATE TABLE tbl_groupmatches (
     match_id    integer REFERENCES tbl_matches,
+    grpround_id integer REFERENCES tbl_grouprounds,
     group_id    integer REFERENCES tbl_groups,
 	round_id	integer REFERENCES tbl_rounds,
-	PRIMARY KEY (match_id, group_id, round_id)
+	PRIMARY KEY (match_id, grpround_id, group_id, round_id)
 	) WITH OIDS;   
 
 -- Knockout matches
