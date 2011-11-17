@@ -452,3 +452,36 @@ CREATE VIEW switchpos_list AS
 	FROM tbl_switchpositions, lineup_list, positions_list
 	WHERE tbl_switchpositions.lineup_id = lineup_list.lineup_id
 		AND tbl_switchpositions.switchposition_id = positions_list.position_id;
+		
+-- -------------------------------------------------
+-- ShootoutOpenersList View
+-- -------------------------------------------------
+		
+CREATE VIEW shootoutopeners_list AS
+    SELECT knockout_match_list.match_id,
+            competition,
+            match_date,
+            round,
+            game,
+            matchup,
+            tm_name AS team_first
+    FROM knockout_match_list, tbl_teams, tbl_penshootoutopeners
+    WHERE tbl_shootoutopeners.match_id = knockout_match_list.match_id
+        AND tbl_shootoutopeners.team_id = tbl_teams.team_id;
+        
+-- -------------------------------------------------
+-- ShootoutList View
+-- -------------------------------------------------
+
+CREATE VIEW shootout_list AS
+    SELECT knockout_match_list.match_id,
+            team,
+            player,
+            round_desc AS shootout_round,
+            po_desc AS outcome
+    FROM knockout_match_list, lineup_list, tbl_penaltyshootouts, tbl_rounds, tbl_penoutcomes
+    WHERE tbl_penaltyshootouts.lineup_id = lineup_list.lineup_id
+        AND tbl_penaltyshootouts.round_id = tbl_rounds.round_id
+        AND tbl_penaltyshootouts.penoutcome_id = tbl_penoutcomes.penoutcome_id
+        AND knockout_match_list.match_id IN (SELECT match_id FROM tbl_lineups 
+                                            WHERE tbl_lineups.lineup_id = tbl_penaltyshootouts.lineup_id);
