@@ -195,7 +195,7 @@ CREATE VIEW match_list AS
 -- -------------------------------------------------
 
 CREATE VIEW league_match_list AS
-	SELECT match_id,
+	SELECT match_list.match_id,
 				 competition,
 				 match_date,
 				 round_desc AS round,
@@ -212,7 +212,7 @@ CREATE VIEW league_match_list AS
 -- -------------------------------------------------
 
 CREATE VIEW group_match_list AS
-	SELECT match_id,
+	SELECT match_list.match_id,
 				 competition,
 				 match_date,
 				 grpround_desc AS round,
@@ -233,7 +233,7 @@ CREATE VIEW group_match_list AS
 -- -------------------------------------------------
 
 CREATE VIEW knockout_match_list AS
-	SELECT match_id,
+	SELECT match_list.match_id,
 				 competition,
 				 match_date,
 				 koround_desc AS round,
@@ -402,7 +402,7 @@ CREATE VIEW expulsions_list AS
 	WHERE tbl_offenses.lineup_id = lineup_list.lineup_id
 		AND tbl_offenses.foul_id = tbl_fouls.foul_id
 		AND tbl_offenses.card_id IN (SELECT card_id FROM tbl_cards
-				WHERE card_type IN ('Yellow/Red','Red');
+				WHERE card_type IN ('Yellow/Red','Red'));
 
 -- -------------------------------------------------
 -- SubstitutionsList View
