@@ -321,12 +321,12 @@ CREATE VIEW goals_list AS
 				 			ELSE gls_time || '+' || gls_stime || ''''
 				 END AS time
 	FROM tbl_teams, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals
-	WHERE match_list.match_id IN (SELECT match_id FROM tbl_lineups)
+	WHERE match_list.match_id IN (SELECT match_id FROM tbl_lineups 
+	                              WHERE tbl_lineups.lineup_id = tbl_goals.lineup_id)
 		AND tbl_goals.lineup_id = lineup_list.lineup_id
 		AND tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id
 		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id
-	  AND tbl_goals.team_id IN (SELECT team_id FROM tbl_lineups
-	  							WHERE tbl_lineups.lineup_id = lineup_list.lineup_id);
+	  AND tbl_goals.team_id = tbl_teams.team_id;
 
 -- -------------------------------------------------
 -- OwnGoalsList View
@@ -419,21 +419,20 @@ CREATE VIEW outsub_list AS
 	WHERE tbl_outsubstitutions.lineup_id = lineup_list.lineup_id;
 
 CREATE VIEW subs_list AS
-	SELECT tbl_substitutions.subs_id, 
-			 a1.matchup, 
-			 a1.team, 
-			 a1.player AS in_player, 
-			 a2.player AS out_player, 
-			 case when subs_stime = 0 then subs_time || '''' 
-			 			else subs_time || '+' || subs_stime || '''' 
-			 end AS time 
-	FROM lineup_list a1, lineup_list a2, tbl_substitutions, tbl_insubstitutions, tbl_outsubstitutions 
-	WHERE a1.player in (SELECT player FROM lineup_list 
-						WHERE lineup_list.lineup_id = tbl_insubstitutions.lineup_id) 
-		AND a2.player in (SELECT player FROM lineup_list 
-						  WHERE lineup_list.lineup_id = tbl_outsubstitutions.lineup_id) 
-		AND (tbl_substitutions.subs_id = tbl_insubstitutions.subs_id 
-			AND tbl_substitutions.subs_id = tbl_outsubstitutions.subs_id);
+    SELECT tbl_substitutions.subs_id, 
+           a1.matchup, 
+           a1.team, 
+           a1.player AS in_player, 
+           a2.player AS out_player, 
+           CASE WHEN subs_stime = 0 THEN subs_time || '''' 
+                ELSE subs_time || '+' || subs_stime || '''' 
+           END AS time FROM lineup_list a1, lineup_list a2, tbl_substitutions                                                                     
+    INNER JOIN tbl_insubstitutions ON tbl_substitutions.subs_id = tbl_insubstitutions.subs_id
+    INNER JOIN tbl_outsubstitutions ON tbl_substitutions.subs_id = tbl_outsubstitutions.subs_id
+    WHERE a1.lineup_id = tbl_insubstitutions.lineup_id
+      AND a2.lineup_id = tbl_outsubstitutions.lineup_id
+      AND a1.team = a2.team
+      AND a1.matchup = a2.matchup;
 	
 -- -------------------------------------------------
 -- SwitchPositionsList View
