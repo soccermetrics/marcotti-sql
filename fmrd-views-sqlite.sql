@@ -34,10 +34,13 @@ CREATE VIEW timezone_list AS
 	SELECT timezone_id,
 		    tz_name,
 			confed_name AS confed,
-			CASE WHEN tz_offset < 0 THEN
-			    replace(round(tz_offset+0.5),'.0','') || ':' || replace(abs((tz_offset-round(tz_offset+0.5))*60),'.0','')
-			ELSE
-				replace(round(tz_offset-0.5),'.0','') || ':' || replace(abs((tz_offset-round(tz_offset-0.5))*60),'.0','')
+			CASE 
+			    WHEN tz_offset < 0 THEN
+			        replace(round(tz_offset+0.5),'.0','') || ':' || substr(replace(abs((tz_offset-round(tz_offset+0.5))*60),'.0','0'),1,2)
+		        WHEN tz_offset = 0.0 THEN
+		            '0:00'
+			    ELSE
+				    replace(round(tz_offset-0.5),'.0','') || ':' || substr(replace(abs((tz_offset-round(tz_offset-0.5))*60),'.0','0'),1,2)
 			END AS offset
 	FROM tbl_timezones, tbl_confederations
 	WHERE tbl_timezones.confed_id = tbl_confederations.confed_id;
