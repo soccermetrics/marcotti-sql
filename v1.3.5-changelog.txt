@@ -1,5 +1,5 @@
-FMRD-SQL Version 1.3.5
-======================
+FMRD-SQL Version 1.3.5a
+=======================
 
 Changes relative to Version 1.3.1
 ---------------------------------
@@ -12,3 +12,7 @@ Changes relative to Version 1.3.1
 * Resolved field ambiguities in (League/Knockout/Group) Match List views
 * Resolved Cartesian join in Goals list
 * Revised join logic in Substitutions list to improve query efficiency
+
+Changes relative to Version 1.3.5
+---------------------------------
+* Added team field to Match Event views
