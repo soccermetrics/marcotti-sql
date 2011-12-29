@@ -357,6 +357,7 @@ CREATE VIEW owngoals_list AS
 CREATE VIEW penalties_list AS
 	SELECT penalty_id,
 				 matchup,
+				 team,
 				 player AS taker,
 				 foul_desc AS foul,
 				 po_desc AS outcome,
@@ -375,6 +376,7 @@ CREATE VIEW penalties_list AS
 CREATE VIEW cautions_list AS
 	SELECT offense_id,
 				 matchup,
+				 team,
 				 player,
 				 foul_desc AS foul,
 				 CASE WHEN ofns_stime = 0 THEN ofns_time || ''''
@@ -393,6 +395,7 @@ CREATE VIEW cautions_list AS
 CREATE VIEW expulsions_list AS
 	SELECT offense_id,
 				 matchup,
+				 team,
 				 player,
 				 foul_desc AS foul,
 				 CASE WHEN ofns_stime = 0 THEN ofns_time || ''''
