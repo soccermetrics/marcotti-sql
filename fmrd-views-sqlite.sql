@@ -1,4 +1,4 @@
--- fmrd-views.sql: View schema for Football Match Result Database
+-- fmrd-views-sqlite.sql: View schema for Football Match Result Database, SQLite version
 -- Version: 1.4.0
 -- Author: Howard Hamilton
 -- Date: 2011-12-29
@@ -20,9 +20,16 @@ CREATE VIEW countries_list AS
 				 
 CREATE VIEW timezone_list AS
 	SELECT timezone_id,
-				 tz_name,
-				 confed_name AS confed,
-				 trunc(tz_offset) || ':' || to_char(abs(tz_offset-trunc(tz_offset))*60, 'FM00') AS offset
+		    tz_name,
+			confed_name AS confed,
+			CASE 
+			    WHEN tz_offset < 0 THEN
+			        replace(round(tz_offset+0.5),'.0','') || ':' || substr(replace(abs((tz_offset-round(tz_offset+0.5))*60),'.0','0'),1,2)
+		        WHEN tz_offset = 0.0 THEN
+		            '0:00'
+			    ELSE
+				    replace(round(tz_offset-0.5),'.0','') || ':' || substr(replace(abs((tz_offset-round(tz_offset-0.5))*60),'.0','0'),1,2)
+			END AS offset
 	FROM tbl_timezones, tbl_confederations
 	WHERE tbl_timezones.confed_id = tbl_confederations.confed_id;
 				 				 
@@ -32,12 +39,11 @@ CREATE VIEW timezone_list AS
 
 CREATE VIEW positions_list AS
 	SELECT position_id,
-				 CASE WHEN tbl_positions.posflank_id IN 
-				 					 (SELECT posflank_id FROM tbl_flanknames 
-				 					  WHERE posflank_name IS NULL) 
-				 			THEN posfield_name
-				 		  ELSE posflank_name || ' ' || posfield_name
-				 END AS position_name
+			CASE WHEN tbl_positions.posflank_id IN 
+				(SELECT posflank_id FROM tbl_flanknames WHERE posflank_name IS NULL) 
+			THEN posfield_name
+			ELSE posflank_name || ' ' || posfield_name
+			END AS position_name
 	FROM tbl_positions, tbl_fieldnames, tbl_flanknames
 	WHERE tbl_positions.posflank_id = tbl_flanknames.posflank_id
 		AND tbl_positions.posfield_id = tbl_fieldnames.posfield_id;		
@@ -48,15 +54,17 @@ CREATE VIEW positions_list AS
 
 CREATE VIEW players_list AS
 	SELECT player_id,
-				 CASE WHEN plyr_nickname IS NOT NULL THEN plyr_nickname
-				 		  ELSE plyr_firstname || ' ' || plyr_lastname
-				 END AS full_name,
-				 CASE WHEN plyr_nickname IS NOT NULL THEN plyr_nickname
-				 		  ELSE plyr_lastname
-				 END AS sort_name,				 
-				 position_name,
-				 plyr_birthdate AS birthdate,
-				 country
+			CASE WHEN plyr_nickname IS NOT NULL 
+			THEN plyr_nickname
+			ELSE plyr_firstname || ' ' || plyr_lastname
+			END AS full_name,
+			CASE WHEN plyr_nickname IS NOT NULL 
+			THEN plyr_nickname
+			ELSE plyr_lastname
+			END AS sort_name,				 
+			position_name,
+			plyr_birthdate AS birthdate,
+			country
 	FROM tbl_players, countries_list, positions_list
 	WHERE tbl_players.country_id = countries_list.country_id
 	  AND tbl_players.plyr_defposid = positions_list.position_id;		
@@ -67,9 +75,9 @@ CREATE VIEW players_list AS
 
 CREATE VIEW playerhistory_list AS
 	SELECT full_name AS player,
-				 plyrhist_date AS effective,
-				 plyrhist_height AS height,
-				 plyrhist_weight AS weight
+			plyrhist_date AS effective,
+			plyrhist_height AS height,
+			plyrhist_weight AS weight
 	FROM tbl_playerhistory, players_list
 	WHERE players_list.player_id = tbl_playerhistory.player_id;
 				 
@@ -79,14 +87,14 @@ CREATE VIEW playerhistory_list AS
 
 CREATE VIEW managers_list AS
 	SELECT manager_id,
-				 CASE WHEN mgr_nickname IS NOT NULL THEN mgr_nickname
-				 		  ELSE mgr_firstname || ' ' || mgr_lastname
-				 END AS full_name,
-				 CASE WHEN mgr_nickname IS NOT NULL THEN mgr_nickname
-				 		  ELSE mgr_lastname
-				 END AS sort_name,				 				 
-				 mgr_birthdate AS birthdate,
-				 country
+			CASE WHEN mgr_nickname IS NOT NULL THEN mgr_nickname
+			ELSE mgr_firstname || ' ' || mgr_lastname
+			END AS full_name,
+			CASE WHEN mgr_nickname IS NOT NULL THEN mgr_nickname
+			ELSE mgr_lastname
+			END AS sort_name,				 				 
+			mgr_birthdate AS birthdate,
+			country
 	FROM tbl_managers, countries_list
 	WHERE tbl_managers.country_id = countries_list.country_id;		
 
@@ -96,10 +104,10 @@ CREATE VIEW managers_list AS
 
 CREATE VIEW referees_list AS
 	SELECT referee_id,
-				 ref_firstname || ' ' || ref_lastname AS full_name,
-				 ref_lastname AS sort_name,
-				 ref_birthdate AS birthdate,
-				 country
+			ref_firstname || ' ' || ref_lastname AS full_name,
+			ref_lastname AS sort_name,
+			ref_birthdate AS birthdate,
+			country
 	FROM tbl_referees, countries_list
 	WHERE tbl_referees.country_id = countries_list.country_id;		
 
@@ -417,7 +425,7 @@ CREATE VIEW subs_list AS
            a1.player AS in_player, 
            a2.player AS out_player, 
            CASE WHEN subs_stime = 0 THEN subs_time || '''' 
-                ELSE subs_time || '+' || subs_stime || '''' 
+           ELSE subs_time || '+' || subs_stime || '''' 
            END AS time FROM lineup_list a1, lineup_list a2, tbl_substitutions                                                                     
     INNER JOIN tbl_insubstitutions ON tbl_substitutions.subs_id = tbl_insubstitutions.subs_id
     INNER JOIN tbl_outsubstitutions ON tbl_substitutions.subs_id = tbl_outsubstitutions.subs_id
@@ -438,7 +446,7 @@ CREATE VIEW switchpos_list AS
 				 lineup_list.position_name AS old_position,
 				 positions_list.position_name AS new_position,
 				 CASE WHEN switch_stime = 0 THEN switch_time || ''''
-				 			ELSE switch_time || '+' || switch_stime || ''''
+				 ELSE switch_time || '+' || switch_stime || ''''
 				 END AS time
 	FROM tbl_switchpositions, lineup_list, positions_list
 	WHERE tbl_switchpositions.lineup_id = lineup_list.lineup_id

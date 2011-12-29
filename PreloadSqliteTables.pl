@@ -1,15 +1,15 @@
 #!/usr/bin/perl
 
-#    Title: PreloadTables.pl
-# Synopsis: Load FMRD tables that we prefer to pre-load
-#   Format: ./PreloadTables.pl
-#     Date: 2010-08-01
+#    Title: PreloadSqliteTables.pl
+# Synopsis: Load FMRD tables that we prefer to pre-load (SQLite3 version)
+#   Format: ./PreloadSqliteTables.pl
+#     Date: 2011-12-17
 #  Version: 1.0
 #   Author: Howard Hamilton, Soccermetrics Research & Consulting, LLC
 
 use DBI;
 use DBI qw(:sql_types);
-use DBD::Pg;
+use DBD::SQLite;
 use Term::ReadKey;
 
 # declare subroutines
@@ -18,34 +18,17 @@ sub rtrim($);
 
 ($dbname) = @ARGV;
 
-$attempt = 0;
-$success = 0;
-
 # connect to database
-print "Preload tables...";
+print("Connecting to database file $dbname\n");
+$dbh = DBI->connect("dbi:SQLite:dbname=$dbname","","");
+$dbh->do("PRAGMA foreign_keys = ON");
 
-do {
-    print("\nEnter username: ");
-    chomp(my $user = <STDIN>);
-    print("Enter password: ");
-    ReadMode('noecho');
-    chomp(my $password = <STDIN>);
-    ReadMode(0);
-    print "\n";
-    
-    if (!($dbh = DBI->connect("dbi:Pg:dbname=$dbname",$user,$password,{AutoCommit=>0}))) {
-    	print "Login failed.\n";
-    	$attempt++;
-    }
-    else {
-    	$success = 1;
-    }
-} until ($attempt == 3) || $success;
-print("\nDatabase authentication confirmed.\n");
 print("Enter maximum number of league or shootout rounds: ");
 chomp(my $roundnum = <STDIN>);
 print("[A]lpha or [N]umeric group names: ");
 chomp(my $groupchar = <STDIN>);
+
+print "Preload tables...\n";
 
 # Populate database tables
 load_confederations();
@@ -68,8 +51,11 @@ load_goalevents();
 load_cards();
 load_fouls();
 
+print("Disconnecting database file $dbname\n");
 # close database
 $dbh->disconnect();
+
+print("Database pre-loading complete.\n");
 
 # ---------------------------------------------------------
 # Subroutines
@@ -77,17 +63,20 @@ $dbh->disconnect();
 
 # load confederations subroutine
 sub load_confederations {
+    print("Loading Confederations table\n");
 	# open list file
 	open(LIST,"lists/confed-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_confederations(confed_name) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_confederations(confed_id, confed_name) VALUES (?,?)");
 	
+	$id = 10;
 	# execute
 	while (<LIST>) {
 		chomp;
 		my ($cstr) = split;
-			$sth->execute($cstr);
+		$sth->execute($id,$cstr);
+		$id++;
 	}
 	
 	# commit
@@ -99,13 +88,15 @@ sub load_confederations {
 
 # load country table
 sub load_countries {
+    print("Loading Countries table\n");
 	# open list file -- 2 columns: country and confederation (comma-delimited)
 	open(LIST,"lists/country-list.dat");
 
 	# prepare query and insertion statements
-	$sth = $dbh->prepare("INSERT INTO tbl_countries(confed_id,cty_name) VALUES (?,?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_countries(country_id,confed_id,cty_name) VALUES (?,?,?)");
 	$qth = $dbh->prepare("SELECT confed_id FROM tbl_confederations WHERE confed_name=?");
 	
+	$id = 100;
 	# execute
 	while (<LIST>) {
 		chomp;
@@ -114,7 +105,8 @@ sub load_countries {
 		my @data;
 		while (@data = $qth->fetchrow_array) {
 			my $confedid = $data[0];
-			$sth->execute($confedid,$cstr[0]);
+			$sth->execute($id,$confedid,$cstr[0]);
+			$id++;
 		}
 		$qth->finish();
 	}
@@ -128,13 +120,15 @@ sub load_countries {
 
 # load time zones table
 sub load_timezones {
+    print("Loading Time Zones table\n");
 	# open list file -- 3 columns: confederation, country, and offset
 	open(LIST,"lists/timezone-list.dat");
 	
 	# prepare query and insertion statements
-	$sth = $dbh->prepare("INSERT INTO tbl_timezones(confed_id,tz_name,tz_offset) VALUES (?,?,?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_timezones(timezone_id,confed_id,tz_name,tz_offset) VALUES (?,?,?,?)");
 	$qth = $dbh->prepare("SELECT confed_id FROM tbl_confederations WHERE confed_name=?");
 	
+	$id = 100;
 	# execute
 	while (<LIST>) {
 		chomp;
@@ -142,7 +136,8 @@ sub load_timezones {
 		$qth->execute(trim($cstr[0])) || die "Could not execute query: " . $qth->$errstr;
 		while (my @data = $qth->fetchrow_array) {
 			my $confedid = $data[0];
-			$sth->execute($confedid,trim($cstr[1]),trim($cstr[2]));
+			$sth->execute($id,$confedid,trim($cstr[1]),trim($cstr[2]));
+			$id++;
 		}
 		$qth->finish();
 	}
@@ -155,16 +150,19 @@ sub load_timezones {
 
 # load competition phases table
 sub load_phases {
+    print("Loading Competition Phases table\n");
 	# open list file
 	open(LIST,"lists/phase-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_phases(phase_desc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_phases(phase_id,phase_desc) VALUES (?,?)");
 	
+	$id = 1;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -176,6 +174,7 @@ sub load_phases {
 
 # load groups table
 sub load_groups {
+    print("Loading Groups table\n");
 	$groupkey = $_[0];	# get group identifier
 	
 	if (uc($groupkey) eq 'A') {
@@ -190,12 +189,14 @@ sub load_groups {
     }
 	
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_groups(group_desc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_groups(group_id,group_desc) VALUES (?,?)");
 	
+	$id = 10;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -204,14 +205,17 @@ sub load_groups {
 
 # load rounds table
 sub load_rounds {
+    print("Loading Rounds table\n");
 	$maxrounds = $_[0];	# get maximum number of rounds
 	
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_rounds(round_desc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_rounds(round_id,round_desc) VALUES (?,?)");
 	
+	$id = 10;
 	for ($i=1; $i<=$maxrounds; $i++) {
 		$cstr = "Round " . $i;
-		$sth->execute($cstr);
+		$sth->execute($id,$cstr);
+		$id++;
 	}
 	# commit
 	$dbh->commit();
@@ -219,16 +223,19 @@ sub load_rounds {
 
 # load group rounds table
 sub load_group_rounds {
+    print("Loading Group Rounds table\n");
 	# open list file
 	open(LIST,"lists/group-round-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_grouprounds(grpround_desc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_grouprounds(grpround_id,grpround_desc) VALUES (?,?)");
 	
+	$id = 10;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -240,16 +247,19 @@ sub load_group_rounds {
 
 # load knockout rounds table
 sub load_knockout_rounds {
+    print("Loading Knockout Rounds table\n");
 	# open list file
 	open(LIST,"lists/knockout-round-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_knockoutrounds(koround_desc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_knockoutrounds(koround_id,koround_desc) VALUES (?,?)");
 	
+	$id = 10;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -261,16 +271,19 @@ sub load_knockout_rounds {
 
 # load knockout round matchday table
 sub load_matchdays {
+    print("Loading Knockout Round Matchdays table\n");
 	# open list file
 	open(LIST,"lists/matchday-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_matchdays(matchday_desc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_matchdays(matchday_id,matchday_desc) VALUES (?,?)");
 	
+	$id = 1;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -282,16 +295,19 @@ sub load_matchdays {
 
 # load venue playing surfaces table
 sub load_surfaces {
+    print("Loading Playing Surfaces table\n");
 	# open list file
 	open(LIST,"lists/fieldsurface-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_venuesurfaces(vensurf_desc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_venuesurfaces(venuesurface_id,vensurf_desc) VALUES (?,?)");
 	
+	$id = 1;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -303,16 +319,19 @@ sub load_surfaces {
 
 # load penalty outcomes table
 sub load_penoutcomes {
+    print("Loading Penalty Outcomes table\n");
 	# open list file
 	open(LIST,"lists/penalties-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_penoutcomes(po_desc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_penoutcomes(penoutcome_id,po_desc) VALUES (?,?)");
 	
+	$id = 1;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -324,16 +343,19 @@ sub load_penoutcomes {
 
 # load field position table
 sub load_fieldpos {
+    print("Loading Field Positions table\n");
 	# open list file
 	open(LIST,"lists/fieldname-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_fieldnames(posfield_name) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_fieldnames(posfield_id,posfield_name) VALUES (?,?)");
 	
+	$id = 1;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -345,12 +367,14 @@ sub load_fieldpos {
 
 # load flank name table
 sub load_flankpos {
+    print("Loading Flank Names table\n");
 	# open list file
 	open(LIST,"lists/flankname-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_flanknames(posflank_name) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_flanknames(posflank_id,posflank_name) VALUES (?,?)");
 	
+	$id = 1;
 	# execute
 	while (<LIST>) {
 		chomp;
@@ -358,7 +382,8 @@ sub load_flankpos {
 		if ($cstr[0] eq "undef") {
 			$cstr[0] = undef;
 		}
-		$sth->execute($cstr[0]);
+		$sth->execute($id,$cstr[0]);
+		$id++;
 	}
 	
 	# commit
@@ -370,11 +395,12 @@ sub load_flankpos {
 
 # load positions table
 sub load_positions {
+    print("Loading Positions table\n");
     # open list file -- 2 columns (space-delimited)
     open(LIST, "lists/position-list.dat");
     
     # prepare query and insertion statements
-    $sth = $dbh->prepare("INSERT INTO tbl_positions(posfield_id,posflank_id) VALUES (?,?)");
+    $sth = $dbh->prepare("INSERT INTO tbl_positions(position_id,posfield_id,posflank_id) VALUES (?,?,?)");
     $qth[0] = $dbh->prepare("SELECT posflank_id FROM tbl_flanknames WHERE posflank_name=?");
     $qth[1] = $dbh->prepare("SELECT posfield_id FROM tbl_fieldnames WHERE posfield_name=?");
     $null = $dbh->prepare("SELECT posflank_id FROM tbl_flanknames WHERE posflank_name IS NULL");
@@ -382,6 +408,7 @@ sub load_positions {
     $null->execute();
     @nullval = $null->fetchrow_array;
     
+    $id = 10;
     # execute
     while(<LIST>) {
         chomp;
@@ -398,7 +425,8 @@ sub load_positions {
 			    $flankid = $data1[0];
 			}
 			$fieldid = $data2[0];
-			$sth->execute($fieldid,$flankid);
+			$sth->execute($id,$fieldid,$flankid);
+			$id++;
 		}
 		$qth[0]->finish();
 		$qth[1]->finish();      
@@ -413,16 +441,19 @@ sub load_positions {
 
 # load weather conditions table
 sub load_wxconditions {
+    print("Loading Weather Conditions table\n");
 	# open list file
 	open(LIST,"lists/wxcond-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_weather(wx_conditiondesc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_weather(weather_id,wx_conditiondesc) VALUES (?,?)");
 	
+	$id = 10;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -434,16 +465,19 @@ sub load_wxconditions {
 
 # load goal strikes table
 sub load_goalstrikes {
+    print("Loading Goal Strikes table\n");
 	# open list file
 	open(LIST,"lists/goalstrike-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_goalstrikes(gts_desc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_goalstrikes(gtstype_id,gts_desc) VALUES (?,?)");
 	
+	$id = 1;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -455,16 +489,19 @@ sub load_goalstrikes {
 
 # load goal events table
 sub load_goalevents {
+    print("Loading Goal Events table\n");
 	# open list file
 	open(LIST,"lists/goaltype-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_goalevents(gte_desc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_goalevents(gtetype_id,gte_desc) VALUES (?,?)");
 	
+	$id = 10;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -476,16 +513,19 @@ sub load_goalevents {
 
 # load cards table
 sub load_cards {
+    print("Loading Cards table\n");
 	# open list file
 	open(LIST,"lists/card-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_cards(card_type) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_cards(card_id,card_type) VALUES (?,?)");
 	
+	$id = 1;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit
@@ -497,16 +537,19 @@ sub load_cards {
 
 # load fouls table
 sub load_fouls {
+    print("Loading Fouls table\n");
 	# open list file
 	open(LIST,"lists/fouls-list.dat");
 
 	# prepare
-	$sth = $dbh->prepare("INSERT INTO tbl_fouls(foul_desc) VALUES (?)");
+	$sth = $dbh->prepare("INSERT INTO tbl_fouls(foul_id,foul_desc) VALUES (?,?)");
 	
+	$id = 10;
 	# execute
 	while (<LIST>) {
 		chomp;
-		$sth->execute($_);
+		$sth->execute($id,$_);
+		$id++;
 	}
 	
 	# commit

@@ -1,0 +1,58 @@
+FMRD-SQL National Teams Version 1.4.0
+=====================================
+
+Changes relative to Version 1.2.1
+---------------------------------
+
+* Merged table/view schema changes from master branch (v1.3.5)
+
+* Corrected player alias error in playerhistory_list view
+* Created Competition Phases table
+    - League : full league tournament, with/without knockout
+    - Group : mini-league in hybrid tournament
+    - Knockout : single- or multi-game elimination matches
+* Created Groups table for mini-league phases
+* Created Matchdays table to track matches in a knockout tie
+* Created Knockout Rounds description table
+* Created Penalty Shootouts table
+* Created linking tables to Matches table
+    - League Matches
+    - Group Matches
+    - Knockout Matches
+* Removed Rounds field from Matches table
+* Added extra-time fields in Matches table
+
+* Removed Rounds field from MatchList view, added Phase field
+* Added LeagueMatchList view
+* Added GroupMatchList view
+* Added KnockoutMatchList view
+* Added CountriesList view
+
+* Set maximum value of match time field to 120 minutes
+  (Goals, Offenses, Penalties, Substitutions, SwitchPositions)
+* Convert ShootoutOpeners table to linking table
+* Create composite primary key for In/OutSubstitutions tables
+
+* Created Group Rounds table
+* Added Group Rounds foreign key to Group Matches table
+* Extended composite primary key in Group Matches table
+* Created Penalty Shootout views
+* Changed date field name in Match view
+* Added group round description to GroupMatchList
+* Created list file of default Group Round descriptions
+* Added load_grouprounds() function to PreloadTables.pl
+* Fixed "knockout-rounds-list.dat" typo in PreloadTables.pl
+
+* Added SQLite functionality (tables, views, pre-loading scripts)
+* Added error message in FMRD install script if user fails to include database name
+* Added "Foot" (generic) option in Goal Strike list
+* Added more events in Goal Events list
+* Added "Miss" option in Penalty Outcomes list
+* Corrected type in matchday sequence name (Postgres)
+* Resolved field ambiguities in (League/Knockout/Group) Match List views
+* Resolved Cartesian join in Goals list
+* Revised join logic in Substitutions list to improve query efficiency
+
+
+
+
