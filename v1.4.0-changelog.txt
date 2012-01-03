@@ -1,4 +1,4 @@
-FMRD-SQL National Teams Version 1.4.0a
+FMRD-SQL National Teams Version 1.4.0b
 ======================================
 
 Changes relative to Version 1.2.1
@@ -56,3 +56,8 @@ Changes relative to Version 1.2.1
 Changes relative to Version 1.4.0
 ---------------------------------
 * Assigned 'America/Asuncion' timezone to CONMEBOL confederation
+
+Changes relative to Version 1.4.0a
+----------------------------------
+* Corrected erroneous reference to tbl_positions in tbl_switchpositions definition
+
