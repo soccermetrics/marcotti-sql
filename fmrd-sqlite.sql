@@ -402,7 +402,7 @@ CREATE TABLE tbl_outsubstitutions (
 CREATE TABLE tbl_switchpositions (
 	switch_id			integer PRIMARY KEY,
 	lineup_id			integer REFERENCES tbl_lineups(lineup_id),
-	switchposition_id	integer REFERENCES tbl_positions(switchposition_id),
+	switchposition_id	integer REFERENCES tbl_positions(position_id),
 	switch_time			integer NOT NULL CHECK (switch_time > 0 AND switch_time < 120),
 	switch_stime		integer DEFAULT 0 CHECK (switch_stime >= 0 AND switch_stime <= 15)
 	);

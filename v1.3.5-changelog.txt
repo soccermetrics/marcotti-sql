@@ -1,4 +1,4 @@
-FMRD-SQL Version 1.3.5a
+FMRD-SQL Version 1.3.5b
 =======================
 
 Changes relative to Version 1.3.1
@@ -16,3 +16,7 @@ Changes relative to Version 1.3.1
 Changes relative to Version 1.3.5
 ---------------------------------
 * Added team field to Match Event views
+
+Changes relative to Version 1.3.5a
+----------------------------------
+* Corrected erroneous reference to Positions table in SwitchPositions table
