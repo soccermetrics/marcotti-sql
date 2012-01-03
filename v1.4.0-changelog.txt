@@ -1,5 +1,5 @@
-FMRD-SQL National Teams Version 1.4.0
-=====================================
+FMRD-SQL National Teams Version 1.4.0a
+======================================
 
 Changes relative to Version 1.2.1
 ---------------------------------
@@ -53,6 +53,6 @@ Changes relative to Version 1.2.1
 * Resolved Cartesian join in Goals list
 * Revised join logic in Substitutions list to improve query efficiency
 
-
-
-
+Changes relative to Version 1.4.0
+---------------------------------
+* Assigned 'America/Asuncion' timezone to CONMEBOL confederation

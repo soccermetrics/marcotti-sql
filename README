@@ -1,5 +1,5 @@
-FMRD-SQL Version 1.4.0
-======================
+FMRD-SQL Version 1.4.0a
+=======================
 
 This is the SQL implementation of the Football Match Result Database.
 It currently operates on PostgreSQL and SQLite databases.
