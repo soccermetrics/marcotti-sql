@@ -352,11 +352,12 @@ CREATE VIEW owngoals_list AS
 				 ELSE gls_time || '+' || gls_stime || ''''
 				 END AS time
 	FROM tbl_teams, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals
-	WHERE match_list.match_id IN (SELECT match_id FROM tbl_lineups)
-	  AND tbl_goals.lineup_id = lineup_list.lineup_id
+	WHERE match_list.match_id IN (SELECT match_id FROM tbl_lineups
+								WHERE tbl_goals.lineup_id = tbl_lineups.lineup_id)
+	    AND tbl_goals.lineup_id = lineup_list.lineup_id
 		AND tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id
 		AND tbl_goals.gtetype_id = tbl_goalevents.gtetype_id	  
-	  AND tbl_goals.team_id NOT IN (SELECT team_id FROM tbl_lineups
+	    AND tbl_goals.team_id NOT IN (SELECT team_id FROM tbl_lineups
 	  								WHERE tbl_lineups.lineup_id = lineup_list.lineup_id);
 
 -- -------------------------------------------------
