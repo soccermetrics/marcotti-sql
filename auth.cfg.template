@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#    Title: auth.cfg
+# Synopsis: Store username/password for database servers
+#   Format: n/a
+#     Date: 2012-05-14
+#  Version: 0.8
+#   Author: Howard Hamilton, Soccermetrics Research & Consulting, LLC
+
+$DBUSER_MY = usernameMySQL
+$DBPASS_MY = passwordMySQL
+
+$DBUSER_PG = usernamePostgres
+$DBPASS_PG = passwordPostgres
