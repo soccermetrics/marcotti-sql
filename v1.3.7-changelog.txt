@@ -1,0 +1,16 @@
+FMRD-SQL Version 1.3.7
+======================
+
+Changes relative to Version 1.3.5b
+----------------------------------
+* Created MySQL compatible FMRD schema and install scripts
+* Assigned 'America/Asunción' timezone to CONMEBOL confederation
+* Corrected erroneous reference to tbl_positions in tbl_switchpositions definition
+* Added new goal event descriptions:
+    - Flick on from corner kick
+    - Flick on from free kick
+    - Flick on from throw-in
+    - Shot inside goal area
+    - Shot outside goal area
+    - Maneuver around goalkeeper
+* Edited Own Goals view and removed Cartesian join
