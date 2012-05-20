@@ -185,9 +185,20 @@ CREATE TABLE tbl_matchdays (
     ) CHARACTER SET utf8 ENGINE=InnoDB;	
 ALTER TABLE tbl_matchdays AUTO_INCREMENT=1;
 
+-- Teams table	
+CREATE TABLE tbl_teams (
+	team_id 	integer NOT NULL AUTO_INCREMENT,
+    country_id  integer NOT NULL,
+	tm_name	    varchar(50) NOT NULL,
+	PRIMARY KEY (team_id),
+	FOREIGN KEY (country_id) REFERENCES tbl_countries (country_id)
+	) CHARACTER SET utf8 ENGINE=InnoDB;
+ALTER TABLE tbl_teams AUTO_INCREMENT=10000;	
+	
 -- Venues table
 CREATE TABLE tbl_venues (
 	venue_id		integer NOT NULL AUTO_INCREMENT,
+	team_id			integer NOT NULL,
 	country_id		integer NOT NULL,
 	timezone_id		integer NOT NULL,
 	ven_city		varchar(40) NOT NULL,
@@ -199,6 +210,7 @@ CREATE TABLE tbl_venues (
 	ven_longitude	numeric(9,6) DEFAULT 0.000000 CHECK (ven_longitude >= -180.000000
 								 AND ven_longitude <=  180.000000),
     PRIMARY KEY (venue_id),
+    FOREIGN KEY (team_id) REFERENCES tbl_teams (team_id),
     FOREIGN KEY (country_id) REFERENCES tbl_countries (country_id),
     FOREIGN KEY (timezone_id) REFERENCES tbl_timezones (timezone_id)
 	) CHARACTER SET utf8 ENGINE=InnoDB;
@@ -245,12 +257,14 @@ ALTER TABLE tbl_matches AUTO_INCREMENT=1000000;
 CREATE TABLE tbl_lineups (
 	lineup_id			integer NOT NULL AUTO_INCREMENT,
 	match_id			integer NOT NULL,
+	team_id			    integer NOT NULL,
 	player_id			integer NOT NULL,
 	position_id			integer NOT NULL,
 	lp_starting			boolean DEFAULT FALSE,
 	lp_captain			boolean DEFAULT FALSE,
 	PRIMARY KEY (lineup_id),
 	FOREIGN KEY (match_id) REFERENCES tbl_matches (match_id),
+	FOREIGN KEY (team_id) REFERENCES tbl_teams (team_id),
 	FOREIGN KEY (player_id) REFERENCES tbl_players (player_id),
 	FOREIGN KEY (position_id) REFERENCES tbl_positions (position_id)
 	) CHARACTER SET utf8 ENGINE=InnoDB;
@@ -296,18 +310,18 @@ CREATE TABLE tbl_knockoutmatches (
 -- Home/away teams
 CREATE TABLE tbl_hometeams (
 	match_id	integer NOT NULL,
-	country_id	integer	NOT NULL,
-	PRIMARY KEY (match_id, country_id),
+	team_id	    integer	NOT NULL,
+	PRIMARY KEY (match_id, team_id),
 	FOREIGN KEY (match_id) REFERENCES tbl_matches (match_id),
-	FOREIGN KEY (country_id) REFERENCES tbl_countries (country_id)	
+	FOREIGN KEY (team_id) REFERENCES tbl_teams (team_id)	
 	) CHARACTER SET utf8 ENGINE=InnoDB;
 	
 CREATE TABLE tbl_awayteams (
 	match_id	integer NOT NULL,
-	country_id	integer	NOT NULL,
-	PRIMARY KEY (match_id, country_id),
+	team_id	    integer	NOT NULL,
+	PRIMARY KEY (match_id, team_id),
 	FOREIGN KEY (match_id) REFERENCES tbl_matches (match_id),
-	FOREIGN KEY (country_id) REFERENCES tbl_countries (country_id)	
+	FOREIGN KEY (team_id) REFERENCES tbl_teams (team_id)	
 	) CHARACTER SET utf8 ENGINE=InnoDB;	
 
 -- Home/away managers	
@@ -405,14 +419,14 @@ ALTER TABLE tbl_goalevents AUTO_INCREMENT=10;
 -- Goals table	
 CREATE TABLE tbl_goals (
 	goal_id		integer NOT NULL AUTO_INCREMENT,
-	country_id	integer NOT NULL,
+	team_id	    integer NOT NULL,
 	lineup_id	integer NOT NULL,
 	gtstype_id	integer NOT NULL,
 	gtetype_id	integer NOT NULL,
 	gls_time	integer NOT NULL CHECK (gls_time > 0 AND gls_time <= 120),
 	gls_stime	integer DEFAULT 0 CHECK (gls_stime >= 0 AND gls_stime <= 15),
 	PRIMARY KEY (goal_id),
-	FOREIGN KEY (country_id) REFERENCES tbl_countries (country_id),
+	FOREIGN KEY (team_id) REFERENCES tbl_teams (team_id),
 	FOREIGN KEY (lineup_id) REFERENCES tbl_lineups (lineup_id),
 	FOREIGN KEY (gtstype_id) REFERENCES tbl_goalstrikes (gtstype_id),
 	FOREIGN KEY (gtetype_id) REFERENCES tbl_goalevents (gtetype_id)
@@ -490,10 +504,10 @@ ALTER TABLE tbl_penaltyshootouts AUTO_INCREMENT=100000;
 -- Penalty Shootout opener table
 CREATE TABLE tbl_penshootoutopeners (
     match_id    integer NOT NULL,
-    country_id  integer NOT NULL,
-    PRIMARY KEY (match_id, country_id),
+    team_id     integer NOT NULL,
+    PRIMARY KEY (match_id, team_id),
 	FOREIGN KEY (match_id) REFERENCES tbl_matches (match_id),
-	FOREIGN KEY (country_id) REFERENCES tbl_countries (country_id)	
+	FOREIGN KEY (team_id) REFERENCES tbl_teams (team_id)	
     ) CHARACTER SET utf8 ENGINE=InnoDB;
     
 -- Substitutions table
