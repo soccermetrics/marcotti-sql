@@ -1,0 +1,4221 @@
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = off;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET escape_string_warning = off;
+
+SET search_path = public, pg_catalog;
+
+--
+-- Name: matchseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE matchseq
+    START WITH 1000000
+    INCREMENT BY 1
+    MAXVALUE 9999999
+    MINVALUE 1000000
+    CACHE 1;
+
+
+ALTER TABLE public.matchseq OWNER TO howard;
+
+--
+-- Name: matchseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('matchseq', 1000000, false);
+
+
+SET default_tablespace = '';
+
+SET default_with_oids = true;
+
+--
+-- Name: tbl_awayteams; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_awayteams (
+    match_id integer NOT NULL,
+    team_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_awayteams OWNER TO howard;
+
+--
+-- Name: tbl_matches; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_matches (
+    match_id integer DEFAULT nextval('matchseq'::regclass) NOT NULL,
+    match_date date,
+    match_firsthalftime integer DEFAULT 45,
+    match_secondhalftime integer DEFAULT 45,
+    match_firstovertime integer DEFAULT 0,
+    match_secondovertime integer DEFAULT 0,
+    match_attendance integer DEFAULT 0,
+    competition_id integer,
+    phase_id integer,
+    venue_id integer,
+    referee_id integer,
+    CONSTRAINT tbl_matches_match_attendance_check CHECK ((match_attendance >= 0)),
+    CONSTRAINT tbl_matches_match_firsthalftime_check CHECK ((match_firsthalftime > 0)),
+    CONSTRAINT tbl_matches_match_firstovertime_check CHECK ((match_firstovertime >= 0)),
+    CONSTRAINT tbl_matches_match_secondhalftime_check CHECK ((match_secondhalftime >= 0)),
+    CONSTRAINT tbl_matches_match_secondovertime_check CHECK ((match_secondovertime >= 0))
+);
+
+
+ALTER TABLE public.tbl_matches OWNER TO howard;
+
+--
+-- Name: teamseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE teamseq
+    START WITH 10000
+    INCREMENT BY 1
+    MAXVALUE 99999
+    MINVALUE 10000
+    CACHE 1;
+
+
+ALTER TABLE public.teamseq OWNER TO howard;
+
+--
+-- Name: teamseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('teamseq', 10000, false);
+
+
+--
+-- Name: tbl_teams; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_teams (
+    team_id integer DEFAULT nextval('teamseq'::regclass) NOT NULL,
+    country_id integer,
+    tm_name character varying(50) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_teams OWNER TO howard;
+
+--
+-- Name: awayteam_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW awayteam_list AS
+    SELECT tbl_matches.match_id, tbl_teams.tm_name AS team FROM tbl_matches, tbl_awayteams, tbl_teams WHERE ((tbl_matches.match_id = tbl_awayteams.match_id) AND (tbl_awayteams.team_id = tbl_teams.team_id));
+
+
+ALTER TABLE public.awayteam_list OWNER TO howard;
+
+--
+-- Name: cardseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE cardseq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 9
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.cardseq OWNER TO howard;
+
+--
+-- Name: cardseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('cardseq', 3, true);
+
+
+--
+-- Name: compseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE compseq
+    START WITH 100
+    INCREMENT BY 1
+    MAXVALUE 999
+    MINVALUE 100
+    CACHE 1;
+
+
+ALTER TABLE public.compseq OWNER TO howard;
+
+--
+-- Name: compseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('compseq', 100, false);
+
+
+--
+-- Name: conseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE conseq
+    START WITH 10
+    INCREMENT BY 1
+    MAXVALUE 99
+    MINVALUE 10
+    CACHE 1;
+
+
+ALTER TABLE public.conseq OWNER TO howard;
+
+--
+-- Name: conseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('conseq', 15, true);
+
+
+--
+-- Name: ctryseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE ctryseq
+    START WITH 100
+    INCREMENT BY 1
+    MAXVALUE 999
+    MINVALUE 100
+    CACHE 1;
+
+
+ALTER TABLE public.ctryseq OWNER TO howard;
+
+--
+-- Name: ctryseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('ctryseq', 319, true);
+
+
+--
+-- Name: tbl_confederations; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_confederations (
+    confed_id integer DEFAULT nextval('conseq'::regclass) NOT NULL,
+    confed_name character varying(40) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_confederations OWNER TO howard;
+
+--
+-- Name: tbl_countries; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_countries (
+    country_id integer DEFAULT nextval('ctryseq'::regclass) NOT NULL,
+    confed_id integer,
+    cty_name character varying(60) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_countries OWNER TO howard;
+
+--
+-- Name: countries_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW countries_list AS
+    SELECT tbl_countries.country_id, tbl_countries.cty_name AS country, tbl_confederations.confed_name AS confed FROM tbl_countries, tbl_confederations WHERE (tbl_countries.confed_id = tbl_confederations.confed_id);
+
+
+ALTER TABLE public.countries_list OWNER TO howard;
+
+--
+-- Name: fieldseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE fieldseq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 9
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fieldseq OWNER TO howard;
+
+--
+-- Name: fieldseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('fieldseq', 9, true);
+
+
+--
+-- Name: flankseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE flankseq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 9
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.flankseq OWNER TO howard;
+
+--
+-- Name: flankseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('flankseq', 4, true);
+
+
+--
+-- Name: foulseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE foulseq
+    START WITH 10
+    INCREMENT BY 1
+    MAXVALUE 99
+    MINVALUE 10
+    CACHE 1;
+
+
+ALTER TABLE public.foulseq OWNER TO howard;
+
+--
+-- Name: foulseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('foulseq', 26, true);
+
+
+--
+-- Name: tbl_hometeams; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_hometeams (
+    match_id integer NOT NULL,
+    team_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_hometeams OWNER TO howard;
+
+--
+-- Name: hometeam_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW hometeam_list AS
+    SELECT tbl_matches.match_id, tbl_teams.tm_name AS team FROM tbl_matches, tbl_hometeams, tbl_teams WHERE ((tbl_matches.match_id = tbl_hometeams.match_id) AND (tbl_hometeams.team_id = tbl_teams.team_id));
+
+
+ALTER TABLE public.hometeam_list OWNER TO howard;
+
+--
+-- Name: lineupseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE lineupseq
+    START WITH 1000000
+    INCREMENT BY 1
+    MAXVALUE 9999999
+    MINVALUE 1000000
+    CACHE 1;
+
+
+ALTER TABLE public.lineupseq OWNER TO howard;
+
+--
+-- Name: lineupseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('lineupseq', 1000000, false);
+
+
+--
+-- Name: phaseseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE phaseseq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 3
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.phaseseq OWNER TO howard;
+
+--
+-- Name: phaseseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('phaseseq', 3, true);
+
+
+--
+-- Name: refseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE refseq
+    START WITH 1000
+    INCREMENT BY 1
+    MAXVALUE 9999
+    MINVALUE 1000
+    CACHE 1;
+
+
+ALTER TABLE public.refseq OWNER TO howard;
+
+--
+-- Name: refseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('refseq', 1000, false);
+
+
+--
+-- Name: tbl_referees; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_referees (
+    referee_id integer DEFAULT nextval('refseq'::regclass) NOT NULL,
+    country_id integer,
+    ref_birthdate date NOT NULL,
+    ref_firstname character varying(20) NOT NULL,
+    ref_lastname character varying(30) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_referees OWNER TO howard;
+
+--
+-- Name: referees_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW referees_list AS
+    SELECT tbl_referees.referee_id, (((tbl_referees.ref_firstname)::text || ' '::text) || (tbl_referees.ref_lastname)::text) AS full_name, tbl_referees.ref_lastname AS sort_name, tbl_referees.ref_birthdate AS birthdate, countries_list.country FROM tbl_referees, countries_list WHERE (tbl_referees.country_id = countries_list.country_id);
+
+
+ALTER TABLE public.referees_list OWNER TO howard;
+
+--
+-- Name: tbl_competitions; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_competitions (
+    competition_id integer DEFAULT nextval('compseq'::regclass) NOT NULL,
+    comp_name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_competitions OWNER TO howard;
+
+--
+-- Name: tbl_phases; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_phases (
+    phase_id integer DEFAULT nextval('phaseseq'::regclass) NOT NULL,
+    phase_desc character varying(12) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_phases OWNER TO howard;
+
+--
+-- Name: tzseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE tzseq
+    START WITH 100
+    INCREMENT BY 1
+    MAXVALUE 999
+    MINVALUE 100
+    CACHE 1;
+
+
+ALTER TABLE public.tzseq OWNER TO howard;
+
+--
+-- Name: tzseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('tzseq', 480, true);
+
+
+--
+-- Name: tbl_timezones; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_timezones (
+    timezone_id integer DEFAULT nextval('tzseq'::regclass) NOT NULL,
+    confed_id integer,
+    tz_name character varying(80) NOT NULL,
+    tz_offset numeric(4,2) DEFAULT 0,
+    CONSTRAINT tbl_timezones_tz_offset_check CHECK (((tz_offset >= (-12.0)) AND (tz_offset <= 14.0)))
+);
+
+
+ALTER TABLE public.tbl_timezones OWNER TO howard;
+
+--
+-- Name: venueseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE venueseq
+    START WITH 1000
+    INCREMENT BY 1
+    MAXVALUE 9999
+    MINVALUE 1000
+    CACHE 1;
+
+
+ALTER TABLE public.venueseq OWNER TO howard;
+
+--
+-- Name: venueseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('venueseq', 1000, false);
+
+
+--
+-- Name: tbl_venues; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_venues (
+    venue_id integer DEFAULT nextval('venueseq'::regclass) NOT NULL,
+    team_id integer,
+    country_id integer,
+    timezone_id integer,
+    ven_city character varying(40) NOT NULL,
+    ven_name character varying(40) NOT NULL,
+    ven_altitude numeric(4,0) DEFAULT 0,
+    ven_latitude numeric(8,6) DEFAULT 0.000000,
+    ven_longitude numeric(9,6) DEFAULT 0.000000,
+    CONSTRAINT tbl_venues_ven_altitude_check CHECK (((ven_altitude >= ((-200))::numeric) AND (ven_altitude <= (4500)::numeric))),
+    CONSTRAINT tbl_venues_ven_latitude_check CHECK (((ven_latitude >= (-90.000000)) AND (ven_latitude <= 90.000000))),
+    CONSTRAINT tbl_venues_ven_longitude_check CHECK (((ven_longitude >= (-180.000000)) AND (ven_longitude <= 180.000000)))
+);
+
+
+ALTER TABLE public.tbl_venues OWNER TO howard;
+
+--
+-- Name: venue_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW venue_list AS
+    SELECT tbl_venues.venue_id, tbl_venues.ven_name AS venue, tbl_venues.ven_city AS city, countries_list.country, tbl_timezones.tz_name AS timezone, tbl_venues.ven_altitude AS altitude, tbl_venues.ven_latitude AS latitude, tbl_venues.ven_longitude AS longitude FROM tbl_venues, countries_list, tbl_timezones WHERE ((countries_list.country_id = tbl_venues.country_id) AND (tbl_venues.timezone_id = tbl_timezones.timezone_id));
+
+
+ALTER TABLE public.venue_list OWNER TO howard;
+
+--
+-- Name: match_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW match_list AS
+    SELECT tbl_matches.match_id, tbl_competitions.competition_id, tbl_competitions.comp_name AS competition, tbl_matches.match_date, tbl_phases.phase_desc AS phase, (((hometeam_list.team)::text || ' vs '::text) || (awayteam_list.team)::text) AS matchup, venue_list.venue, referees_list.full_name AS referee FROM tbl_matches, tbl_competitions, tbl_phases, hometeam_list, awayteam_list, venue_list, referees_list WHERE ((((((hometeam_list.match_id = tbl_matches.match_id) AND (awayteam_list.match_id = tbl_matches.match_id)) AND (tbl_competitions.competition_id = tbl_matches.competition_id)) AND (tbl_phases.phase_id = tbl_matches.phase_id)) AND (venue_list.venue_id = tbl_matches.venue_id)) AND (referees_list.referee_id = tbl_matches.referee_id));
+
+
+ALTER TABLE public.match_list OWNER TO howard;
+
+--
+-- Name: plyrseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE plyrseq
+    START WITH 100000
+    INCREMENT BY 1
+    MAXVALUE 999999
+    MINVALUE 100000
+    CACHE 1;
+
+
+ALTER TABLE public.plyrseq OWNER TO howard;
+
+--
+-- Name: plyrseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('plyrseq', 100001, true);
+
+
+--
+-- Name: posseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE posseq
+    START WITH 10
+    INCREMENT BY 1
+    MAXVALUE 99
+    MINVALUE 10
+    CACHE 1;
+
+
+ALTER TABLE public.posseq OWNER TO howard;
+
+--
+-- Name: posseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('posseq', 27, true);
+
+
+--
+-- Name: tbl_fieldnames; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_fieldnames (
+    posfield_id integer DEFAULT nextval('fieldseq'::regclass) NOT NULL,
+    posfield_name character varying(15) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_fieldnames OWNER TO howard;
+
+--
+-- Name: tbl_flanknames; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_flanknames (
+    posflank_id integer DEFAULT nextval('flankseq'::regclass) NOT NULL,
+    posflank_name character varying(8)
+);
+
+
+ALTER TABLE public.tbl_flanknames OWNER TO howard;
+
+--
+-- Name: tbl_positions; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_positions (
+    position_id integer DEFAULT nextval('posseq'::regclass) NOT NULL,
+    posfield_id integer,
+    posflank_id integer
+);
+
+
+ALTER TABLE public.tbl_positions OWNER TO howard;
+
+--
+-- Name: positions_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW positions_list AS
+    SELECT tbl_positions.position_id, CASE WHEN (tbl_positions.posflank_id IN (SELECT tbl_flanknames.posflank_id FROM tbl_flanknames WHERE (tbl_flanknames.posflank_name IS NULL))) THEN (tbl_fieldnames.posfield_name)::text ELSE (((tbl_flanknames.posflank_name)::text || ' '::text) || (tbl_fieldnames.posfield_name)::text) END AS position_name FROM tbl_positions, tbl_fieldnames, tbl_flanknames WHERE ((tbl_positions.posflank_id = tbl_flanknames.posflank_id) AND (tbl_positions.posfield_id = tbl_fieldnames.posfield_id));
+
+
+ALTER TABLE public.positions_list OWNER TO howard;
+
+--
+-- Name: tbl_players; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_players (
+    player_id integer DEFAULT nextval('plyrseq'::regclass) NOT NULL,
+    country_id integer,
+    plyr_birthdate date NOT NULL,
+    plyr_firstname character varying(20) NOT NULL,
+    plyr_lastname character varying(30) NOT NULL,
+    plyr_nickname character varying(30),
+    plyr_defposid integer
+);
+
+
+ALTER TABLE public.tbl_players OWNER TO howard;
+
+--
+-- Name: players_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW players_list AS
+    SELECT tbl_players.player_id, CASE WHEN (tbl_players.plyr_nickname IS NOT NULL) THEN (tbl_players.plyr_nickname)::text ELSE (((tbl_players.plyr_firstname)::text || ' '::text) || (tbl_players.plyr_lastname)::text) END AS full_name, CASE WHEN (tbl_players.plyr_nickname IS NOT NULL) THEN tbl_players.plyr_nickname ELSE tbl_players.plyr_lastname END AS sort_name, positions_list.position_name, tbl_players.plyr_birthdate AS birthdate, countries_list.country FROM tbl_players, countries_list, positions_list WHERE ((tbl_players.country_id = countries_list.country_id) AND (tbl_players.plyr_defposid = positions_list.position_id));
+
+
+ALTER TABLE public.players_list OWNER TO howard;
+
+--
+-- Name: tbl_lineups; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_lineups (
+    lineup_id integer DEFAULT nextval('lineupseq'::regclass) NOT NULL,
+    match_id integer,
+    team_id integer,
+    player_id integer,
+    position_id integer,
+    lp_starting boolean DEFAULT false,
+    lp_captain boolean DEFAULT false
+);
+
+
+ALTER TABLE public.tbl_lineups OWNER TO howard;
+
+--
+-- Name: lineup_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW lineup_list AS
+    SELECT tbl_lineups.lineup_id, match_list.matchup, tbl_teams.tm_name AS team, players_list.full_name AS player, players_list.sort_name, positions_list.position_name, tbl_lineups.lp_starting AS starter, tbl_lineups.lp_captain AS captain FROM tbl_teams, players_list, positions_list, match_list, tbl_lineups WHERE ((((tbl_lineups.team_id = tbl_teams.team_id) AND (tbl_lineups.match_id = match_list.match_id)) AND (players_list.player_id = tbl_lineups.player_id)) AND (tbl_lineups.position_id = positions_list.position_id));
+
+
+ALTER TABLE public.lineup_list OWNER TO howard;
+
+--
+-- Name: offseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE offseq
+    START WITH 100000
+    INCREMENT BY 1
+    MAXVALUE 999999
+    MINVALUE 100000
+    CACHE 1;
+
+
+ALTER TABLE public.offseq OWNER TO howard;
+
+--
+-- Name: offseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('offseq', 100000, false);
+
+
+--
+-- Name: tbl_cards; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_cards (
+    card_id integer DEFAULT nextval('cardseq'::regclass) NOT NULL,
+    card_type character varying(12) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_cards OWNER TO howard;
+
+--
+-- Name: tbl_fouls; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_fouls (
+    foul_id integer DEFAULT nextval('foulseq'::regclass) NOT NULL,
+    foul_desc character varying(40) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_fouls OWNER TO howard;
+
+--
+-- Name: tbl_offenses; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_offenses (
+    offense_id integer DEFAULT nextval('offseq'::regclass) NOT NULL,
+    lineup_id integer,
+    foul_id integer,
+    card_id integer,
+    ofns_time integer NOT NULL,
+    ofns_stime integer DEFAULT 0,
+    CONSTRAINT tbl_offenses_ofns_stime_check CHECK (((ofns_stime >= 0) AND (ofns_stime <= 15))),
+    CONSTRAINT tbl_offenses_ofns_time_check CHECK (((ofns_time > 0) AND (ofns_time <= 120)))
+);
+
+
+ALTER TABLE public.tbl_offenses OWNER TO howard;
+
+--
+-- Name: cautions_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW cautions_list AS
+    SELECT tbl_offenses.offense_id, lineup_list.matchup, lineup_list.player, tbl_fouls.foul_desc AS foul, CASE WHEN (tbl_offenses.ofns_stime = 0) THEN (tbl_offenses.ofns_time || ''''::text) ELSE (((tbl_offenses.ofns_time || '+'::text) || tbl_offenses.ofns_stime) || ''''::text) END AS "time" FROM tbl_offenses, lineup_list, tbl_fouls WHERE (((tbl_offenses.lineup_id = lineup_list.lineup_id) AND (tbl_offenses.foul_id = tbl_fouls.foul_id)) AND (tbl_offenses.card_id IN (SELECT tbl_cards.card_id FROM tbl_cards WHERE ((tbl_cards.card_type)::text = 'Yellow'::text))));
+
+
+ALTER TABLE public.cautions_list OWNER TO howard;
+
+--
+-- Name: enviroseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE enviroseq
+    START WITH 1000000
+    INCREMENT BY 1
+    MAXVALUE 9999999
+    MINVALUE 1000000
+    CACHE 1;
+
+
+ALTER TABLE public.enviroseq OWNER TO howard;
+
+--
+-- Name: enviroseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('enviroseq', 1000000, false);
+
+
+--
+-- Name: wxseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE wxseq
+    START WITH 10
+    INCREMENT BY 1
+    MAXVALUE 99
+    MINVALUE 10
+    CACHE 1;
+
+
+ALTER TABLE public.wxseq OWNER TO howard;
+
+--
+-- Name: wxseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('wxseq', 26, true);
+
+
+--
+-- Name: tbl_weather; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_weather (
+    weather_id integer DEFAULT nextval('wxseq'::regclass) NOT NULL,
+    wx_conditiondesc character varying(40) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_weather OWNER TO howard;
+
+--
+-- Name: tbl_weatherfulltime; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_weatherfulltime (
+    enviro_id integer NOT NULL,
+    weather_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_weatherfulltime OWNER TO howard;
+
+--
+-- Name: ftwx_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW ftwx_list AS
+    SELECT tbl_weatherfulltime.enviro_id, tbl_weather.wx_conditiondesc AS cond FROM tbl_weatherfulltime, tbl_weather WHERE (tbl_weather.weather_id = tbl_weatherfulltime.weather_id);
+
+
+ALTER TABLE public.ftwx_list OWNER TO howard;
+
+--
+-- Name: tbl_weatherhalftime; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_weatherhalftime (
+    enviro_id integer NOT NULL,
+    weather_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_weatherhalftime OWNER TO howard;
+
+--
+-- Name: htwx_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW htwx_list AS
+    SELECT tbl_weatherhalftime.enviro_id, tbl_weather.wx_conditiondesc AS cond FROM tbl_weatherhalftime, tbl_weather WHERE (tbl_weather.weather_id = tbl_weatherhalftime.weather_id);
+
+
+ALTER TABLE public.htwx_list OWNER TO howard;
+
+--
+-- Name: tbl_weatherkickoff; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_weatherkickoff (
+    enviro_id integer NOT NULL,
+    weather_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_weatherkickoff OWNER TO howard;
+
+--
+-- Name: kowx_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW kowx_list AS
+    SELECT tbl_weatherkickoff.enviro_id, tbl_weather.wx_conditiondesc AS cond FROM tbl_weatherkickoff, tbl_weather WHERE (tbl_weather.weather_id = tbl_weatherkickoff.weather_id);
+
+
+ALTER TABLE public.kowx_list OWNER TO howard;
+
+--
+-- Name: tbl_environments; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_environments (
+    enviro_id integer DEFAULT nextval('enviroseq'::regclass) NOT NULL,
+    match_id integer,
+    env_kickofftime time without time zone,
+    env_temperature numeric(4,2),
+    CONSTRAINT tbl_environments_env_temperature_check CHECK (((env_temperature >= (-15.0)) AND (env_temperature <= 45.0)))
+);
+
+
+ALTER TABLE public.tbl_environments OWNER TO howard;
+
+--
+-- Name: enviro_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW enviro_list AS
+    SELECT tbl_environments.enviro_id, match_list.matchup, tbl_environments.env_kickofftime AS kickoff_time, tbl_environments.env_temperature AS temperature, kowx_list.cond AS kickoff_wx, htwx_list.cond AS halftime_wx, ftwx_list.cond AS fulltime_wx FROM tbl_environments, match_list, kowx_list, htwx_list, ftwx_list WHERE ((((tbl_environments.match_id = match_list.match_id) AND (tbl_environments.enviro_id = kowx_list.enviro_id)) AND (tbl_environments.enviro_id = htwx_list.enviro_id)) AND (tbl_environments.enviro_id = ftwx_list.enviro_id));
+
+
+ALTER TABLE public.enviro_list OWNER TO howard;
+
+--
+-- Name: expulsions_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW expulsions_list AS
+    SELECT tbl_offenses.offense_id, lineup_list.matchup, lineup_list.player, tbl_fouls.foul_desc AS foul, CASE WHEN (tbl_offenses.ofns_stime = 0) THEN (tbl_offenses.ofns_time || ''''::text) ELSE (((tbl_offenses.ofns_time || '+'::text) || tbl_offenses.ofns_stime) || ''''::text) END AS "time" FROM tbl_offenses, lineup_list, tbl_fouls WHERE (((tbl_offenses.lineup_id = lineup_list.lineup_id) AND (tbl_offenses.foul_id = tbl_fouls.foul_id)) AND (tbl_offenses.card_id IN (SELECT tbl_cards.card_id FROM tbl_cards WHERE ((tbl_cards.card_type)::text = ANY ((ARRAY['Yellow/Red'::character varying, 'Red'::character varying])::text[])))));
+
+
+ALTER TABLE public.expulsions_list OWNER TO howard;
+
+--
+-- Name: gevtseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE gevtseq
+    START WITH 10
+    INCREMENT BY 1
+    MAXVALUE 99
+    MINVALUE 10
+    CACHE 1;
+
+
+ALTER TABLE public.gevtseq OWNER TO howard;
+
+--
+-- Name: gevtseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('gevtseq', 19, true);
+
+
+--
+-- Name: goalseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE goalseq
+    START WITH 100000
+    INCREMENT BY 1
+    MAXVALUE 999999
+    MINVALUE 100000
+    CACHE 1;
+
+
+ALTER TABLE public.goalseq OWNER TO howard;
+
+--
+-- Name: goalseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('goalseq', 100000, false);
+
+
+--
+-- Name: gstkseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE gstkseq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 9
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.gstkseq OWNER TO howard;
+
+--
+-- Name: gstkseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('gstkseq', 6, true);
+
+
+--
+-- Name: tbl_goalevents; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_goalevents (
+    gtetype_id integer DEFAULT nextval('gevtseq'::regclass) NOT NULL,
+    gte_desc character varying(30) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_goalevents OWNER TO howard;
+
+--
+-- Name: tbl_goals; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_goals (
+    goal_id integer DEFAULT nextval('goalseq'::regclass) NOT NULL,
+    team_id integer,
+    lineup_id integer,
+    gtstype_id integer,
+    gtetype_id integer,
+    gls_time integer NOT NULL,
+    gls_stime integer DEFAULT 0,
+    CONSTRAINT tbl_goals_gls_stime_check CHECK (((gls_stime >= 0) AND (gls_stime <= 15))),
+    CONSTRAINT tbl_goals_gls_time_check CHECK (((gls_time > 0) AND (gls_time <= 120)))
+);
+
+
+ALTER TABLE public.tbl_goals OWNER TO howard;
+
+--
+-- Name: tbl_goalstrikes; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_goalstrikes (
+    gtstype_id integer DEFAULT nextval('gstkseq'::regclass) NOT NULL,
+    gts_desc character varying(15) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_goalstrikes OWNER TO howard;
+
+--
+-- Name: goals_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW goals_list AS
+    SELECT tbl_goals.goal_id, match_list.matchup, tbl_teams.tm_name AS team, lineup_list.player AS scorer, tbl_goalstrikes.gts_desc AS strike, tbl_goalevents.gte_desc AS play, CASE WHEN (tbl_goals.gls_stime = 0) THEN (tbl_goals.gls_time || ''''::text) ELSE (((tbl_goals.gls_time || '+'::text) || tbl_goals.gls_stime) || ''''::text) END AS "time" FROM tbl_teams, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals WHERE (((((match_list.match_id IN (SELECT tbl_lineups.match_id FROM tbl_lineups WHERE (tbl_lineups.lineup_id = tbl_goals.lineup_id))) AND (lineup_list.lineup_id = tbl_goals.lineup_id)) AND (tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id)) AND (tbl_goals.gtetype_id = tbl_goalevents.gtetype_id)) AND (tbl_goals.team_id = tbl_teams.team_id));
+
+
+ALTER TABLE public.goals_list OWNER TO howard;
+
+--
+-- Name: groupseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE groupseq
+    START WITH 10
+    INCREMENT BY 1
+    MAXVALUE 99
+    MINVALUE 10
+    CACHE 1;
+
+
+ALTER TABLE public.groupseq OWNER TO howard;
+
+--
+-- Name: groupseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('groupseq', 21, true);
+
+
+--
+-- Name: grproundseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE grproundseq
+    START WITH 10
+    INCREMENT BY 1
+    MAXVALUE 99
+    MINVALUE 10
+    CACHE 1;
+
+
+ALTER TABLE public.grproundseq OWNER TO howard;
+
+--
+-- Name: grproundseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('grproundseq', 19, true);
+
+
+--
+-- Name: roundseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE roundseq
+    START WITH 10
+    INCREMENT BY 1
+    MAXVALUE 99
+    MINVALUE 10
+    CACHE 1;
+
+
+ALTER TABLE public.roundseq OWNER TO howard;
+
+--
+-- Name: roundseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('roundseq', 17, true);
+
+
+--
+-- Name: tbl_groupmatches; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_groupmatches (
+    match_id integer NOT NULL,
+    grpround_id integer NOT NULL,
+    group_id integer NOT NULL,
+    round_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_groupmatches OWNER TO howard;
+
+--
+-- Name: tbl_grouprounds; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_grouprounds (
+    grpround_id integer DEFAULT nextval('grproundseq'::regclass) NOT NULL,
+    grpround_desc character varying(40) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_grouprounds OWNER TO howard;
+
+--
+-- Name: tbl_groups; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_groups (
+    group_id integer DEFAULT nextval('groupseq'::regclass) NOT NULL,
+    group_desc character varying(2) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_groups OWNER TO howard;
+
+--
+-- Name: tbl_rounds; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_rounds (
+    round_id integer DEFAULT nextval('roundseq'::regclass) NOT NULL,
+    round_desc character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_rounds OWNER TO howard;
+
+--
+-- Name: group_match_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW group_match_list AS
+    SELECT match_list.match_id, match_list.competition, match_list.match_date, tbl_grouprounds.grpround_desc AS round, tbl_groups.group_desc AS group_name, tbl_rounds.round_desc AS matchday, match_list.matchup, match_list.venue, match_list.referee FROM match_list, tbl_rounds, tbl_groups, tbl_grouprounds, tbl_groupmatches WHERE (((((tbl_groupmatches.match_id = match_list.match_id) AND (tbl_groupmatches.grpround_id = tbl_grouprounds.grpround_id)) AND (tbl_groupmatches.group_id = tbl_groups.group_id)) AND (tbl_groupmatches.round_id = tbl_rounds.round_id)) AND ((match_list.phase)::text = 'Group'::text));
+
+
+ALTER TABLE public.group_match_list OWNER TO howard;
+
+--
+-- Name: tbl_insubstitutions; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_insubstitutions (
+    subs_id integer NOT NULL,
+    lineup_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_insubstitutions OWNER TO howard;
+
+--
+-- Name: insub_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW insub_list AS
+    SELECT tbl_insubstitutions.subs_id, lineup_list.player FROM tbl_insubstitutions, lineup_list WHERE (tbl_insubstitutions.lineup_id = lineup_list.lineup_id);
+
+
+ALTER TABLE public.insub_list OWNER TO howard;
+
+--
+-- Name: koroundseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE koroundseq
+    START WITH 10
+    INCREMENT BY 1
+    MAXVALUE 99
+    MINVALUE 10
+    CACHE 1;
+
+
+ALTER TABLE public.koroundseq OWNER TO howard;
+
+--
+-- Name: koroundseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('koroundseq', 32, true);
+
+
+--
+-- Name: matchdayseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE matchdayseq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 9
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.matchdayseq OWNER TO howard;
+
+--
+-- Name: matchdayseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('matchdayseq', 7, true);
+
+
+--
+-- Name: tbl_knockoutmatches; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_knockoutmatches (
+    match_id integer NOT NULL,
+    koround_id integer NOT NULL,
+    matchday_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_knockoutmatches OWNER TO howard;
+
+--
+-- Name: tbl_knockoutrounds; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_knockoutrounds (
+    koround_id integer DEFAULT nextval('koroundseq'::regclass) NOT NULL,
+    koround_desc character varying(40) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_knockoutrounds OWNER TO howard;
+
+--
+-- Name: tbl_matchdays; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_matchdays (
+    matchday_id integer DEFAULT nextval('matchdayseq'::regclass) NOT NULL,
+    matchday_desc character varying(12) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_matchdays OWNER TO howard;
+
+--
+-- Name: knockout_match_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW knockout_match_list AS
+    SELECT match_list.match_id, match_list.competition, match_list.match_date, tbl_knockoutrounds.koround_desc AS round, tbl_matchdays.matchday_desc AS game, match_list.matchup, match_list.venue, match_list.referee FROM match_list, tbl_knockoutrounds, tbl_matchdays, tbl_knockoutmatches WHERE ((((match_list.match_id = tbl_knockoutmatches.match_id) AND (tbl_knockoutmatches.koround_id = tbl_knockoutrounds.koround_id)) AND (tbl_knockoutmatches.matchday_id = tbl_matchdays.matchday_id)) AND ((match_list.phase)::text = 'Knockout'::text));
+
+
+ALTER TABLE public.knockout_match_list OWNER TO howard;
+
+--
+-- Name: tbl_leaguematches; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_leaguematches (
+    match_id integer NOT NULL,
+    round_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_leaguematches OWNER TO howard;
+
+--
+-- Name: league_match_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW league_match_list AS
+    SELECT match_list.match_id, match_list.competition, match_list.match_date, tbl_rounds.round_desc AS round, match_list.matchup, match_list.venue, match_list.referee FROM match_list, tbl_rounds, tbl_leaguematches WHERE (((match_list.match_id = tbl_leaguematches.match_id) AND (tbl_leaguematches.round_id = tbl_rounds.round_id)) AND ((match_list.phase)::text = 'League'::text));
+
+
+ALTER TABLE public.league_match_list OWNER TO howard;
+
+--
+-- Name: mgrseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE mgrseq
+    START WITH 1000
+    INCREMENT BY 1
+    MAXVALUE 9999
+    MINVALUE 1000
+    CACHE 1;
+
+
+ALTER TABLE public.mgrseq OWNER TO howard;
+
+--
+-- Name: mgrseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('mgrseq', 1000, false);
+
+
+--
+-- Name: tbl_managers; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_managers (
+    manager_id integer DEFAULT nextval('mgrseq'::regclass) NOT NULL,
+    country_id integer,
+    mgr_birthdate date NOT NULL,
+    mgr_firstname character varying(20) NOT NULL,
+    mgr_lastname character varying(30) NOT NULL,
+    mgr_nickname character varying(30)
+);
+
+
+ALTER TABLE public.tbl_managers OWNER TO howard;
+
+--
+-- Name: managers_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW managers_list AS
+    SELECT tbl_managers.manager_id, CASE WHEN (tbl_managers.mgr_nickname IS NOT NULL) THEN (tbl_managers.mgr_nickname)::text ELSE (((tbl_managers.mgr_firstname)::text || ' '::text) || (tbl_managers.mgr_lastname)::text) END AS full_name, CASE WHEN (tbl_managers.mgr_nickname IS NOT NULL) THEN tbl_managers.mgr_nickname ELSE tbl_managers.mgr_lastname END AS sort_name, tbl_managers.mgr_birthdate AS birthdate, countries_list.country FROM tbl_managers, countries_list WHERE (tbl_managers.country_id = countries_list.country_id);
+
+
+ALTER TABLE public.managers_list OWNER TO howard;
+
+--
+-- Name: tbl_outsubstitutions; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_outsubstitutions (
+    subs_id integer NOT NULL,
+    lineup_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_outsubstitutions OWNER TO howard;
+
+--
+-- Name: outsub_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW outsub_list AS
+    SELECT tbl_outsubstitutions.subs_id, lineup_list.player FROM tbl_outsubstitutions, lineup_list WHERE (tbl_outsubstitutions.lineup_id = lineup_list.lineup_id);
+
+
+ALTER TABLE public.outsub_list OWNER TO howard;
+
+--
+-- Name: owngoals_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW owngoals_list AS
+    SELECT tbl_goals.goal_id, match_list.matchup, tbl_teams.tm_name AS team, lineup_list.player AS scorer, tbl_goalstrikes.gts_desc AS strike, tbl_goalevents.gte_desc AS play, CASE WHEN (tbl_goals.gls_stime = 0) THEN (tbl_goals.gls_time || ''''::text) ELSE (((tbl_goals.gls_time || '+'::text) || tbl_goals.gls_stime) || ''''::text) END AS "time" FROM tbl_teams, match_list, lineup_list, tbl_goalstrikes, tbl_goalevents, tbl_goals WHERE (((((match_list.match_id IN (SELECT tbl_lineups.match_id FROM tbl_lineups)) AND (tbl_goals.lineup_id = lineup_list.lineup_id)) AND (tbl_goals.gtstype_id = tbl_goalstrikes.gtstype_id)) AND (tbl_goals.gtetype_id = tbl_goalevents.gtetype_id)) AND (NOT (tbl_goals.team_id IN (SELECT tbl_lineups.team_id FROM tbl_lineups WHERE (tbl_lineups.lineup_id = lineup_list.lineup_id)))));
+
+
+ALTER TABLE public.owngoals_list OWNER TO howard;
+
+--
+-- Name: penseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE penseq
+    START WITH 10000
+    INCREMENT BY 1
+    MAXVALUE 99999
+    MINVALUE 10000
+    CACHE 1;
+
+
+ALTER TABLE public.penseq OWNER TO howard;
+
+--
+-- Name: penseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('penseq', 10000, false);
+
+
+--
+-- Name: poseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE poseq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 9
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.poseq OWNER TO howard;
+
+--
+-- Name: poseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('poseq', 6, true);
+
+
+--
+-- Name: tbl_penalties; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_penalties (
+    penalty_id integer DEFAULT nextval('penseq'::regclass) NOT NULL,
+    lineup_id integer,
+    foul_id integer,
+    penoutcome_id integer,
+    pen_time integer NOT NULL,
+    pen_stime integer DEFAULT 0,
+    CONSTRAINT tbl_penalties_pen_stime_check CHECK (((pen_stime >= 0) AND (pen_stime <= 15))),
+    CONSTRAINT tbl_penalties_pen_time_check CHECK (((pen_time > 0) AND (pen_time <= 120)))
+);
+
+
+ALTER TABLE public.tbl_penalties OWNER TO howard;
+
+--
+-- Name: tbl_penoutcomes; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_penoutcomes (
+    penoutcome_id integer DEFAULT nextval('poseq'::regclass) NOT NULL,
+    po_desc character varying(15) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_penoutcomes OWNER TO howard;
+
+--
+-- Name: penalties_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW penalties_list AS
+    SELECT tbl_penalties.penalty_id, lineup_list.matchup, lineup_list.player AS taker, tbl_fouls.foul_desc AS foul, tbl_penoutcomes.po_desc AS outcome, CASE WHEN (tbl_penalties.pen_stime = 0) THEN (tbl_penalties.pen_time || ''''::text) ELSE (((tbl_penalties.pen_time || '+'::text) || tbl_penalties.pen_stime) || ''''::text) END AS "time" FROM tbl_penalties, lineup_list, tbl_fouls, tbl_penoutcomes WHERE (((tbl_penalties.foul_id = tbl_fouls.foul_id) AND (tbl_penalties.penoutcome_id = tbl_penoutcomes.penoutcome_id)) AND (tbl_penalties.lineup_id = lineup_list.lineup_id));
+
+
+ALTER TABLE public.penalties_list OWNER TO howard;
+
+--
+-- Name: plyrhistseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE plyrhistseq
+    START WITH 1000000
+    INCREMENT BY 1
+    MAXVALUE 9999999
+    MINVALUE 1000000
+    CACHE 1;
+
+
+ALTER TABLE public.plyrhistseq OWNER TO howard;
+
+--
+-- Name: plyrhistseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('plyrhistseq', 1000000, false);
+
+
+--
+-- Name: tbl_playerhistory; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_playerhistory (
+    playerhistory_id integer DEFAULT nextval('plyrhistseq'::regclass) NOT NULL,
+    player_id integer,
+    plyrhist_date date,
+    plyrhist_height numeric(3,2) DEFAULT 1.50,
+    plyrhist_weight numeric(3,0) DEFAULT 50,
+    CONSTRAINT tbl_playerhistory_plyrhist_height_check CHECK (((plyrhist_height >= (0)::numeric) AND (plyrhist_height <= 2.50))),
+    CONSTRAINT tbl_playerhistory_plyrhist_weight_check CHECK (((plyrhist_weight >= (0)::numeric) AND (plyrhist_weight <= (150)::numeric)))
+);
+
+
+ALTER TABLE public.tbl_playerhistory OWNER TO howard;
+
+--
+-- Name: playerhistory_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW playerhistory_list AS
+    SELECT players_list.full_name AS player, tbl_playerhistory.plyrhist_date AS effective, tbl_playerhistory.plyrhist_height AS height, tbl_playerhistory.plyrhist_weight AS weight FROM tbl_playerhistory, players_list WHERE (players_list.player_id = tbl_playerhistory.player_id);
+
+
+ALTER TABLE public.playerhistory_list OWNER TO howard;
+
+--
+-- Name: shootoutseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE shootoutseq
+    START WITH 100000
+    INCREMENT BY 1
+    MAXVALUE 999999
+    MINVALUE 100000
+    CACHE 1;
+
+
+ALTER TABLE public.shootoutseq OWNER TO howard;
+
+--
+-- Name: shootoutseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('shootoutseq', 100000, false);
+
+
+--
+-- Name: tbl_penaltyshootouts; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_penaltyshootouts (
+    penshootout_id integer DEFAULT nextval('shootoutseq'::regclass) NOT NULL,
+    lineup_id integer,
+    round_id integer,
+    penoutcome_id integer
+);
+
+
+ALTER TABLE public.tbl_penaltyshootouts OWNER TO howard;
+
+--
+-- Name: shootout_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW shootout_list AS
+    SELECT knockout_match_list.match_id, lineup_list.team, lineup_list.player, tbl_rounds.round_desc AS shootout_round, tbl_penoutcomes.po_desc AS outcome FROM knockout_match_list, lineup_list, tbl_penaltyshootouts, tbl_rounds, tbl_penoutcomes WHERE ((((tbl_penaltyshootouts.lineup_id = lineup_list.lineup_id) AND (tbl_penaltyshootouts.round_id = tbl_rounds.round_id)) AND (tbl_penaltyshootouts.penoutcome_id = tbl_penoutcomes.penoutcome_id)) AND (knockout_match_list.match_id IN (SELECT tbl_lineups.match_id FROM tbl_lineups WHERE (tbl_lineups.lineup_id = tbl_penaltyshootouts.lineup_id))));
+
+
+ALTER TABLE public.shootout_list OWNER TO howard;
+
+--
+-- Name: tbl_penshootoutopeners; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_penshootoutopeners (
+    match_id integer NOT NULL,
+    team_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_penshootoutopeners OWNER TO howard;
+
+--
+-- Name: shootoutopeners_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW shootoutopeners_list AS
+    SELECT knockout_match_list.match_id, knockout_match_list.competition, knockout_match_list.match_date, knockout_match_list.round, knockout_match_list.game, knockout_match_list.matchup, tbl_teams.tm_name AS team_first FROM knockout_match_list, tbl_teams, tbl_penshootoutopeners WHERE ((tbl_penshootoutopeners.match_id = knockout_match_list.match_id) AND (tbl_penshootoutopeners.team_id = tbl_teams.team_id));
+
+
+ALTER TABLE public.shootoutopeners_list OWNER TO howard;
+
+--
+-- Name: subsseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE subsseq
+    START WITH 100000
+    INCREMENT BY 1
+    MAXVALUE 999999
+    MINVALUE 100000
+    CACHE 1;
+
+
+ALTER TABLE public.subsseq OWNER TO howard;
+
+--
+-- Name: subsseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('subsseq', 100000, false);
+
+
+--
+-- Name: tbl_substitutions; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_substitutions (
+    subs_id integer DEFAULT nextval('subsseq'::regclass) NOT NULL,
+    subs_time integer NOT NULL,
+    subs_stime integer DEFAULT 0,
+    CONSTRAINT tbl_substitutions_subs_stime_check CHECK (((subs_stime >= 0) AND (subs_stime <= 15))),
+    CONSTRAINT tbl_substitutions_subs_time_check CHECK (((subs_time > 0) AND (subs_time <= 120)))
+);
+
+
+ALTER TABLE public.tbl_substitutions OWNER TO howard;
+
+--
+-- Name: subs_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW subs_list AS
+    SELECT tbl_substitutions.subs_id, a1.matchup, a1.team, a1.player AS in_player, a2.player AS out_player, CASE WHEN (tbl_substitutions.subs_stime = 0) THEN (tbl_substitutions.subs_time || ''''::text) ELSE (((tbl_substitutions.subs_time || '+'::text) || tbl_substitutions.subs_stime) || ''''::text) END AS "time" FROM lineup_list a1, lineup_list a2, ((tbl_substitutions JOIN tbl_insubstitutions ON ((tbl_substitutions.subs_id = tbl_insubstitutions.subs_id))) JOIN tbl_outsubstitutions ON ((tbl_substitutions.subs_id = tbl_outsubstitutions.subs_id))) WHERE ((((a1.lineup_id = tbl_insubstitutions.lineup_id) AND (a2.lineup_id = tbl_outsubstitutions.lineup_id)) AND ((a1.team)::text = (a2.team)::text)) AND (a1.matchup = a2.matchup));
+
+
+ALTER TABLE public.subs_list OWNER TO howard;
+
+--
+-- Name: surfseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE surfseq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 9
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.surfseq OWNER TO howard;
+
+--
+-- Name: surfseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('surfseq', 6, true);
+
+
+--
+-- Name: switchseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE switchseq
+    START WITH 100000
+    INCREMENT BY 1
+    MAXVALUE 999999
+    MINVALUE 100000
+    CACHE 1;
+
+
+ALTER TABLE public.switchseq OWNER TO howard;
+
+--
+-- Name: switchseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('switchseq', 100000, false);
+
+
+--
+-- Name: tbl_switchpositions; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_switchpositions (
+    switch_id integer DEFAULT nextval('switchseq'::regclass) NOT NULL,
+    lineup_id integer,
+    switchposition_id integer,
+    switch_time integer NOT NULL,
+    switch_stime integer DEFAULT 0,
+    CONSTRAINT tbl_switchpositions_switch_stime_check CHECK (((switch_stime >= 0) AND (switch_stime <= 15))),
+    CONSTRAINT tbl_switchpositions_switch_time_check CHECK (((switch_time > 0) AND (switch_time < 120)))
+);
+
+
+ALTER TABLE public.tbl_switchpositions OWNER TO howard;
+
+--
+-- Name: switchpos_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW switchpos_list AS
+    SELECT tbl_switchpositions.switch_id, lineup_list.matchup, lineup_list.team, lineup_list.player, lineup_list.position_name AS old_position, positions_list.position_name AS new_position, CASE WHEN (tbl_switchpositions.switch_stime = 0) THEN (tbl_switchpositions.switch_time || ''''::text) ELSE (((tbl_switchpositions.switch_time || '+'::text) || tbl_switchpositions.switch_stime) || ''''::text) END AS "time" FROM tbl_switchpositions, lineup_list, positions_list WHERE ((tbl_switchpositions.lineup_id = lineup_list.lineup_id) AND (tbl_switchpositions.switchposition_id = positions_list.position_id));
+
+
+ALTER TABLE public.switchpos_list OWNER TO howard;
+
+--
+-- Name: tbl_awaymanagers; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_awaymanagers (
+    match_id integer NOT NULL,
+    manager_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_awaymanagers OWNER TO howard;
+
+--
+-- Name: tbl_homemanagers; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_homemanagers (
+    match_id integer NOT NULL,
+    manager_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tbl_homemanagers OWNER TO howard;
+
+--
+-- Name: venhistseq; Type: SEQUENCE; Schema: public; Owner: howard
+--
+
+CREATE SEQUENCE venhistseq
+    START WITH 10000
+    INCREMENT BY 1
+    MAXVALUE 99999
+    MINVALUE 10000
+    CACHE 1;
+
+
+ALTER TABLE public.venhistseq OWNER TO howard;
+
+--
+-- Name: venhistseq; Type: SEQUENCE SET; Schema: public; Owner: howard
+--
+
+SELECT pg_catalog.setval('venhistseq', 10000, false);
+
+
+--
+-- Name: tbl_venuehistory; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_venuehistory (
+    venuehistory_id integer DEFAULT nextval('venhistseq'::regclass) NOT NULL,
+    venue_id integer,
+    venuehist_date date,
+    venuesurface_id integer,
+    venue_length integer DEFAULT 105,
+    venue_width integer DEFAULT 68,
+    venuehist_capacity integer DEFAULT 0,
+    venuehist_seats integer DEFAULT 0,
+    CONSTRAINT tbl_venuehistory_venue_length_check CHECK (((venue_length >= 90) AND (venue_length <= 120))),
+    CONSTRAINT tbl_venuehistory_venue_width_check CHECK (((venue_width >= 45) AND (venue_width <= 90))),
+    CONSTRAINT tbl_venuehistory_venuehist_capacity_check CHECK ((venuehist_capacity >= 0)),
+    CONSTRAINT tbl_venuehistory_venuehist_seats_check CHECK ((venuehist_seats >= 0))
+);
+
+
+ALTER TABLE public.tbl_venuehistory OWNER TO howard;
+
+--
+-- Name: tbl_venuesurfaces; Type: TABLE; Schema: public; Owner: howard; Tablespace: 
+--
+
+CREATE TABLE tbl_venuesurfaces (
+    venuesurface_id integer DEFAULT nextval('surfseq'::regclass) NOT NULL,
+    vensurf_desc character varying(30) NOT NULL
+);
+
+
+ALTER TABLE public.tbl_venuesurfaces OWNER TO howard;
+
+--
+-- Name: teams_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW teams_list AS
+    SELECT tbl_teams.team_id, tbl_teams.tm_name AS team_name, tbl_countries.cty_name AS country FROM tbl_teams, tbl_countries WHERE (tbl_teams.country_id = tbl_countries.country_id);
+
+
+ALTER TABLE public.teams_list OWNER TO howard;
+
+--
+-- Name: timezone_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW timezone_list AS
+    SELECT tbl_timezones.timezone_id, tbl_timezones.tz_name, tbl_confederations.confed_name AS confed, ((trunc(tbl_timezones.tz_offset) || ':'::text) || to_char((abs((tbl_timezones.tz_offset - trunc(tbl_timezones.tz_offset))) * (60)::numeric), 'FM00'::text)) AS "offset" FROM tbl_timezones, tbl_confederations WHERE (tbl_timezones.confed_id = tbl_confederations.confed_id);
+
+
+ALTER TABLE public.timezone_list OWNER TO howard;
+
+--
+-- Name: venuehistory_list; Type: VIEW; Schema: public; Owner: howard
+--
+
+CREATE VIEW venuehistory_list AS
+    SELECT venue_list.venue, tbl_venuehistory.venuehist_date AS effective, tbl_venuesurfaces.vensurf_desc AS surface, tbl_venuehistory.venue_length AS length, tbl_venuehistory.venue_width AS width, tbl_venuehistory.venuehist_capacity AS capacity, tbl_venuehistory.venuehist_seats AS seats FROM venue_list, tbl_venuehistory, tbl_venuesurfaces WHERE ((venue_list.venue_id = tbl_venuehistory.venue_id) AND (tbl_venuehistory.venuesurface_id = tbl_venuesurfaces.venuesurface_id));
+
+
+ALTER TABLE public.venuehistory_list OWNER TO howard;
+
+--
+-- Data for Name: tbl_awaymanagers; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_awaymanagers (match_id, manager_id) FROM stdin;
+1000000	1005
+1000001	1004
+1000002	1001
+1000003	1002
+\.
+
+
+--
+-- Data for Name: tbl_awayteams; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_awayteams (match_id, team_id) FROM stdin;
+1000000	10005
+1000001	10004
+1000002	10001
+1000003	10003
+\.
+
+
+--
+-- Data for Name: tbl_cards; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_cards (card_id, card_type) FROM stdin;
+1	Yellow
+2	Yellow/Red
+3	Red
+\.
+
+
+--
+-- Data for Name: tbl_competitions; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_competitions (competition_id, comp_name) FROM stdin;
+100	2009-10 UEFA Champions League
+\.
+
+
+--
+-- Data for Name: tbl_confederations; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_confederations (confed_id, confed_name) FROM stdin;
+10	AFC
+11	CAF
+12	CONCACAF
+13	CONMEBOL
+14	OFC
+15	UEFA
+\.
+
+
+--
+-- Data for Name: tbl_countries; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_countries (country_id, confed_id, cty_name) FROM stdin;
+100	10	Afghanistan
+101	10	Australia
+102	10	Bahrain
+103	10	Bangladesh
+104	10	Bhutan
+105	10	Brunei Darussalam
+106	10	Cambodia
+107	10	China PR
+108	10	Chinese Taipei
+109	10	Guam
+110	10	Hong Kong
+111	10	India
+112	10	Indonesia
+113	10	Iran
+114	10	Iraq
+115	10	Japan
+116	10	Jordan
+117	10	Korea DPR
+118	10	Korea Republic
+119	10	Kuwait
+120	10	Kyrgyzstan
+121	10	Laos
+122	10	Lebanon
+123	10	Macau
+124	10	Malaysia
+125	10	Maldives
+126	10	Mongolia
+127	10	Myanmar
+128	10	Nepal
+129	10	Northern Mariana Islands
+130	10	Oman
+131	10	Pakistan
+132	10	Palestine
+133	10	Philippines
+134	10	Qatar
+135	10	Saudi Arabia
+136	10	Singapore
+137	10	Sri Lanka
+138	10	Syria
+139	10	Tajikistan
+140	10	Thailand
+141	10	Timor-Leste
+142	10	Turkmenistan
+143	10	United Arab Emirates
+144	10	Uzbekistan
+145	10	Vietnam
+146	10	Yemen
+147	11	Algeria
+148	11	Angola
+149	11	Benin
+150	11	Botswana
+151	11	Burkina Faso
+152	11	Burundi
+153	11	Cameroon
+154	11	Cape Verde
+155	11	Central African Republic
+156	11	Chad
+157	11	Comoros
+158	11	Côte d'Ivoire
+159	11	Congo
+160	11	Congo DR
+161	11	Djibouti
+162	11	Egypt
+163	11	Equatorial Guinea
+164	11	Eritrea
+165	11	Ethiopia
+166	11	Gabon
+167	11	Gambia
+168	11	Ghana
+169	11	Guinea
+170	11	Guinea-Bissau
+171	11	Kenya
+172	11	Lesotho
+173	11	Liberia
+174	11	Libya
+175	11	Madagascar
+176	11	Malawi
+177	11	Mali
+178	11	Mauritania
+179	11	Mauritius
+180	11	Morocco
+181	11	Mozambique
+182	11	Namibia
+183	11	Niger
+184	11	Nigeria
+185	11	Réunion
+186	11	Rwanda
+187	11	São Tomé and Príncipe
+188	11	Senegal
+189	11	Seychelles
+190	11	Sierra Leone
+191	11	Somalia
+192	11	South Africa
+193	11	Sudan
+194	11	Swaziland
+195	11	Tanzania
+196	11	Togo
+197	11	Tunisia
+198	11	Uganda
+199	11	Zambia
+200	11	Zimbabwe
+201	12	Anguilla
+202	12	Antigua and Barbuda
+203	12	Aruba
+204	12	Bahamas
+205	12	Barbados
+206	12	Belize
+207	12	Bermuda
+208	12	British Virgin Islands
+209	12	Canada
+210	12	Cayman Islands
+211	12	Costa Rica
+212	12	Cuba
+213	12	Dominica
+214	12	Dominican Republic
+215	12	El Salvador
+216	12	French Guiana
+217	12	Grenada
+218	12	Guadeloupe
+219	12	Guatemala
+220	12	Guyana
+221	12	Haiti
+222	12	Honduras
+223	12	Jamaica
+224	12	Martinique
+225	12	Mexico
+226	12	Montserrat
+227	12	Netherlands Antilles
+228	12	Nicaragua
+229	12	Panama
+230	12	Puerto Rico
+231	12	Saint Kitts and Nevis
+232	12	Saint Lucia
+233	12	Saint-Martin
+234	12	Saint Vincent and the Grenadines
+235	12	Sint Maarten
+236	12	Suriname
+237	12	Trinidad and Tobago
+238	12	Turks and Caicos Islands
+239	12	USA
+240	12	U.S. Virgin Islands
+241	13	Argentina
+242	13	Bolivia
+243	13	Brazil
+244	13	Chile
+245	13	Colombia
+246	13	Ecuador
+247	13	Paraguay
+248	13	Peru
+249	13	Uruguay
+250	13	Venezuela
+251	14	American Samoa
+252	14	Cook Islands
+253	14	Fiji
+254	14	Kiribati
+255	14	Federated States of Micronesia
+256	14	New Caledonia
+257	14	New Zealand
+258	14	Niue
+259	14	Palau
+260	14	Papua New Guinea
+261	14	Samoa
+262	14	Solomon Islands
+263	14	Tahiti
+264	14	Tonga
+265	14	Tuvalu
+266	14	Vanuatu
+267	15	Albania
+268	15	Andorra
+269	15	Armenia
+270	15	Austria
+271	15	Azerbaijan
+272	15	Belarus
+273	15	Belgium
+274	15	Bosnia and Herzegovina
+275	15	Bulgaria
+276	15	Croatia
+277	15	Cyprus
+278	15	Czech Republic
+279	15	Denmark
+280	15	England
+281	15	Estonia
+282	15	Faroe Islands
+283	15	Finland
+284	15	France
+285	15	Georgia
+286	15	Germany
+287	15	Greece
+288	15	Hungary
+289	15	Iceland
+290	15	Republic of Ireland
+291	15	Israel
+292	15	Italy
+293	15	Kazakhstan
+294	15	Latvia
+295	15	Liechtenstein
+296	15	Lithuania
+297	15	Luxembourg
+298	15	FYR Macedonia
+299	15	Malta
+300	15	Moldova
+301	15	Montenegro
+302	15	Netherlands
+303	15	Northern Ireland
+304	15	Norway
+305	15	Poland
+306	15	Portugal
+307	15	Romania
+308	15	Russia
+309	15	San Marino
+310	15	Scotland
+311	15	Serbia
+312	15	Slovakia
+313	15	Slovenia
+314	15	Spain
+315	15	Sweden
+316	15	Switzerland
+317	15	Turkey
+318	15	Ukraine
+319	15	Wales
+\.
+
+
+--
+-- Data for Name: tbl_environments; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_environments (enviro_id, match_id, env_kickofftime, env_temperature) FROM stdin;
+1000000	1000000	20:30:00	20.00
+1000001	1000001	19:00:00	26.00
+\.
+
+
+--
+-- Data for Name: tbl_fieldnames; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_fieldnames (posfield_id, posfield_name) FROM stdin;
+1	Goalkeeper
+2	Full-back
+3	Wing-back
+4	Midfielder
+5	Winger
+6	Striker
+7	Forward
+8	Defender
+9	Libero
+\.
+
+
+--
+-- Data for Name: tbl_flanknames; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_flanknames (posflank_id, posflank_name) FROM stdin;
+1	\N
+2	Left
+3	Right
+4	Central
+\.
+
+
+--
+-- Data for Name: tbl_fouls; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_fouls (foul_id, foul_desc) FROM stdin;
+10	Unknown 
+11	Intentional handball 
+12	Holding 
+13	Reckless challenge 
+14	Excessive celebration 
+15	Simulation 
+16	Dissent 
+17	Persistent infringement 
+18	Delaying restart 
+19	Deadball encroachment 
+20	Unauthorized field entrance/exit 
+21	Serious foul play 
+22	Violent conduct 
+23	Abusive language 
+24	Spitting 
+25	Professional foul 
+26	Handball denied scoring opportunity 
+\.
+
+
+--
+-- Data for Name: tbl_goalevents; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_goalevents (gtetype_id, gte_desc) FROM stdin;
+10	Unknown 
+11	Cross from free kick 
+12	Cross from corner kick 
+13	Cross from open play 
+14	Direct from corner kick 
+15	Direct from free kick 
+16	One-on-one scramble 
+17	Close-range re-direction      
+18	Long-range shot 
+19	Deflected shot                
+\.
+
+
+--
+-- Data for Name: tbl_goals; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_goals (goal_id, team_id, lineup_id, gtstype_id, gtetype_id, gls_time, gls_stime) FROM stdin;
+100000	10004	1000001	2	16	75	0
+100001	10005	1000046	4	12	39	0
+100002	10004	1000063	4	13	82	0
+100003	10000	1000082	2	10	63	0
+100004	10001	1000099	3	17	75	0
+\.
+
+
+--
+-- Data for Name: tbl_goalstrikes; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_goalstrikes (gtstype_id, gts_desc) FROM stdin;
+1	Unknown
+2	Left Foot
+3	Right Foot
+4	Head
+5	Chest
+6	Other
+\.
+
+
+--
+-- Data for Name: tbl_groupmatches; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_groupmatches (match_id, grpround_id, group_id, round_id) FROM stdin;
+1000002	10	10	10
+1000003	10	10	10
+\.
+
+
+--
+-- Data for Name: tbl_grouprounds; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_grouprounds (grpround_id, grpround_desc) FROM stdin;
+10	Group Stage
+11	First Round
+12	Second Round
+13	Third Round
+14	Fourth Round
+15	Final Round
+16	Playoff Group
+17	Championship Group
+18	Promotion Group
+19	Relegation Group
+\.
+
+
+--
+-- Data for Name: tbl_groups; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_groups (group_id, group_desc) FROM stdin;
+10	A
+11	B
+12	C
+13	D
+14	E
+15	F
+16	G
+17	H
+18	I
+19	J
+20	K
+21	L
+\.
+
+
+--
+-- Data for Name: tbl_homemanagers; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_homemanagers (match_id, manager_id) FROM stdin;
+1000000	1004
+1000001	1005
+1000002	1000
+1000003	1003
+\.
+
+
+--
+-- Data for Name: tbl_hometeams; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_hometeams (match_id, team_id) FROM stdin;
+1000000	10004
+1000001	10005
+1000002	10000
+1000003	10002
+\.
+
+
+--
+-- Data for Name: tbl_insubstitutions; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_insubstitutions (subs_id, lineup_id) FROM stdin;
+100000	1000016
+100001	1000012
+100002	1000030
+100003	1000031
+100004	1000017
+100005	1000035
+100006	1000070
+100007	1000071
+100008	1000049
+100009	1000052
+100010	1000048
+100011	1000068
+100012	1000107
+100013	1000085
+100014	1000084
+100015	1000101
+100016	1000087
+\.
+
+
+--
+-- Data for Name: tbl_knockoutmatches; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_knockoutmatches (match_id, koround_id, matchday_id) FROM stdin;
+1000000	12	1
+1000001	12	2
+\.
+
+
+--
+-- Data for Name: tbl_knockoutrounds; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_knockoutrounds (koround_id, koround_desc) FROM stdin;
+10	Extra Preliminary Round
+11	Preliminary Round
+12	First Qualifying Round
+13	Second Qualifying Round
+14	Third Qualifying Round
+15	Fourth Qualifying Round
+16	First Round
+17	Second Round
+18	Third Round
+19	Fourth Round
+20	Fifth Round
+21	Sixth Round
+22	Seventh Round
+23	Eighth Round
+24	Round of 64 (1/32)
+25	Round of 32 (1/16)
+26	Round of 16 (1/8)
+27	Quarterfinal (1/4)
+28	Semi-Final (1/2)
+29	Final
+30	Qualifying Final
+31	Preliminary Final
+32	Grand Final
+\.
+
+
+--
+-- Data for Name: tbl_leaguematches; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_leaguematches (match_id, round_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: tbl_lineups; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_lineups (lineup_id, match_id, team_id, player_id, position_id, lp_starting, lp_captain) FROM stdin;
+1000000	1000000	10004	100036	10	t	f
+1000001	1000000	10004	100042	15	t	f
+1000002	1000000	10004	100040	12	t	f
+1000003	1000000	10004	100041	12	t	f
+1000004	1000000	10004	100038	21	t	f
+1000005	1000000	10004	100044	21	t	f
+1000006	1000000	10004	100045	22	t	f
+1000007	1000000	10004	100039	21	t	f
+1000008	1000000	10004	100043	23	t	t
+1000009	1000000	10004	100037	16	t	f
+1000010	1000000	10004	100046	27	t	f
+1000011	1000000	10004	100047	10	f	f
+1000012	1000000	10004	100050	20	f	f
+1000013	1000000	10004	100051	20	f	f
+1000014	1000000	10004	100052	20	f	f
+1000015	1000000	10004	100053	20	f	f
+1000016	1000000	10004	100054	27	f	f
+1000017	1000000	10004	100055	20	f	f
+1000018	1000000	10005	100056	10	t	f
+1000019	1000000	10005	100063	15	t	f
+1000020	1000000	10005	100057	12	t	f
+1000021	1000000	10005	100066	12	t	f
+1000022	1000000	10005	100064	16	t	f
+1000023	1000000	10005	100062	22	t	f
+1000024	1000000	10005	100058	21	t	t
+1000025	1000000	10005	100061	21	t	f
+1000026	1000000	10005	100065	23	t	f
+1000027	1000000	10005	100059	27	t	f
+1000028	1000000	10005	100060	27	t	f
+1000029	1000000	10005	100067	10	f	f
+1000030	1000000	10005	100068	11	f	f
+1000031	1000000	10005	100069	11	f	f
+1000032	1000000	10005	100070	27	f	f
+1000033	1000000	10005	100073	27	f	f
+1000034	1000000	10005	100074	27	f	f
+1000035	1000000	10005	100075	27	f	f
+1000036	1000001	10005	100056	10	t	f
+1000037	1000001	10005	100068	15	t	f
+1000038	1000001	10005	100066	12	t	f
+1000039	1000001	10005	100057	12	t	f
+1000040	1000001	10005	100064	16	t	f
+1000041	1000001	10005	100062	22	t	f
+1000042	1000001	10005	100061	21	t	f
+1000043	1000001	10005	100058	21	t	t
+1000044	1000001	10005	100065	23	t	f
+1000045	1000001	10005	100060	27	t	f
+1000046	1000001	10005	100059	27	t	f
+1000047	1000001	10005	100067	10	f	f
+1000048	1000001	10005	100069	11	f	f
+1000049	1000001	10005	100071	20	f	f
+1000050	1000001	10005	100070	27	f	f
+1000051	1000001	10005	100073	27	f	f
+1000052	1000001	10005	100075	27	f	f
+1000053	1000001	10005	100072	11	f	f
+1000054	1000001	10004	100036	10	t	f
+1000055	1000001	10004	100042	15	t	f
+1000056	1000001	10004	100040	12	t	f
+1000057	1000001	10004	100041	12	t	f
+1000058	1000001	10004	100037	16	t	f
+1000059	1000001	10004	100044	21	t	f
+1000060	1000001	10004	100038	21	t	f
+1000061	1000001	10004	100045	22	t	f
+1000062	1000001	10004	100050	21	t	f
+1000063	1000001	10004	100043	23	t	t
+1000064	1000001	10004	100039	27	t	f
+1000065	1000001	10004	100047	10	f	f
+1000066	1000001	10004	100048	27	f	f
+1000067	1000001	10004	100049	11	f	f
+1000068	1000001	10004	100051	20	f	f
+1000069	1000001	10004	100046	27	f	f
+1000070	1000001	10004	100054	27	f	f
+1000071	1000001	10004	100055	20	f	f
+1000072	1000002	10000	100000	10	t	t
+1000073	1000002	10000	100004	15	t	f
+1000074	1000002	10000	100003	12	t	f
+1000075	1000002	10000	100010	12	t	f
+1000076	1000002	10000	100001	16	t	f
+1000077	1000002	10000	100009	20	t	f
+1000078	1000002	10000	100002	20	t	f
+1000079	1000002	10000	100005	20	t	f
+1000080	1000002	10000	100008	20	t	f
+1000081	1000002	10000	100007	24	t	f
+1000082	1000002	10000	100006	26	t	f
+1000083	1000002	10000	100011	10	f	f
+1000084	1000002	10000	100012	11	f	f
+1000085	1000002	10000	100013	20	f	f
+1000086	1000002	10000	100014	27	f	f
+1000087	1000002	10000	100015	20	f	f
+1000088	1000002	10000	100016	11	f	f
+1000089	1000002	10000	100017	20	f	f
+1000090	1000002	10001	100018	10	t	f
+1000091	1000002	10001	100027	15	t	f
+1000092	1000002	10001	100019	12	t	f
+1000093	1000002	10001	100026	12	t	f
+1000094	1000002	10001	100025	16	t	f
+1000095	1000002	10001	100020	20	t	t
+1000096	1000002	10001	100021	20	t	f
+1000097	1000002	10001	100023	22	t	f
+1000098	1000002	10001	100022	20	t	f
+1000099	1000002	10001	100024	23	t	f
+1000100	1000002	10001	100028	27	t	f
+1000101	1000002	10001	100032	27	f	f
+1000102	1000002	10001	100030	11	f	f
+1000103	1000002	10001	100034	27	f	f
+1000104	1000002	10001	100031	11	f	f
+1000105	1000002	10001	100033	27	f	f
+1000106	1000002	10001	100035	27	f	f
+1000107	1000002	10001	100029	10	f	f
+\.
+
+
+--
+-- Data for Name: tbl_managers; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_managers (manager_id, country_id, mgr_birthdate, mgr_firstname, mgr_lastname, mgr_nickname) FROM stdin;
+1000	292	1967-02-11	Ciro	Ferrara	\N
+1001	284	1965-11-19	Laurent	Blanc	\N
+1002	302	1951-08-08	Louis	van Gaal	\N
+1003	291	1957-11-18	Elisha	Levy	\N
+1004	309	1973-08-17	Fioriano	Sperindo	\N
+1005	268	1901-01-01	Patricio	González	\N
+\.
+
+
+--
+-- Data for Name: tbl_matchdays; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_matchdays (matchday_id, matchday_desc) FROM stdin;
+1	Match 1
+2	Match 2
+3	Match 3
+4	Match 4
+5	Match 5
+6	Match 6
+7	Match 7
+\.
+
+
+--
+-- Data for Name: tbl_matches; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_matches (match_id, match_date, match_firsthalftime, match_secondhalftime, match_firstovertime, match_secondovertime, match_attendance, competition_id, phase_id, venue_id, referee_id) FROM stdin;
+1000000	2009-07-01	45	45	0	0	564	100	3	1004	1013
+1000001	2009-07-07	45	45	15	15	800	100	3	1005	1012
+1000003	2009-09-15	46	47	0	0	38789	100	2	1002	1001
+1000002	2009-09-15	46	49	0	0	17513	100	2	1000	1000
+\.
+
+
+--
+-- Data for Name: tbl_offenses; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_offenses (offense_id, lineup_id, foul_id, card_id, ofns_time, ofns_stime) FROM stdin;
+100000	1000006	10	1	24	0
+100001	1000004	10	1	33	0
+100002	1000021	10	1	35	0
+100003	1000019	22	3	60	0
+100004	1000012	10	1	70	0
+100005	1000022	10	1	72	0
+100006	1000063	10	1	7	0
+100007	1000061	10	1	14	0
+100008	1000062	10	1	26	0
+100009	1000037	10	1	55	0
+100010	1000062	10	2	60	0
+100011	1000041	10	1	69	0
+100012	1000046	10	1	79	0
+100013	1000059	10	1	90	0
+100014	1000082	14	1	63	0
+100015	1000092	13	1	65	0
+100016	1000080	13	1	68	0
+\.
+
+
+--
+-- Data for Name: tbl_outsubstitutions; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_outsubstitutions (subs_id, lineup_id) FROM stdin;
+100000	1000010
+100001	1000008
+100002	1000023
+100003	1000027
+100004	1000007
+100005	1000026
+100006	1000064
+100007	1000058
+100008	1000045
+100009	1000046
+100010	1000037
+100011	1000063
+100012	1000090
+100013	1000080
+100014	1000074
+100015	1000099
+100016	1000077
+\.
+
+
+--
+-- Data for Name: tbl_penalties; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_penalties (penalty_id, lineup_id, foul_id, penoutcome_id, pen_time, pen_stime) FROM stdin;
+10000	1000024	13	1	42	0
+\.
+
+
+--
+-- Data for Name: tbl_penaltyshootouts; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_penaltyshootouts (penshootout_id, lineup_id, round_id, penoutcome_id) FROM stdin;
+100000	1000043	10	1
+100001	1000059	10	1
+100002	1000038	11	2
+100003	1000055	11	1
+100004	1000041	12	1
+100005	1000060	12	2
+100006	1000048	13	1
+100007	1000070	13	1
+100008	1000044	14	1
+100009	1000057	14	1
+100010	1000039	15	1
+100011	1000061	15	2
+\.
+
+
+--
+-- Data for Name: tbl_penoutcomes; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_penoutcomes (penoutcome_id, po_desc) FROM stdin;
+1	Goal 
+2	Save 
+3	Wide of post 
+4	Over crossbar 
+5	Hit post 
+6	Hit crossbar 
+\.
+
+
+--
+-- Data for Name: tbl_penshootoutopeners; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_penshootoutopeners (match_id, team_id) FROM stdin;
+1000001	10005
+\.
+
+
+--
+-- Data for Name: tbl_phases; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_phases (phase_id, phase_desc) FROM stdin;
+1	League
+2	Group
+3	Knockout
+\.
+
+
+--
+-- Data for Name: tbl_playerhistory; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_playerhistory (playerhistory_id, player_id, plyrhist_date, plyrhist_height, plyrhist_weight) FROM stdin;
+\.
+
+
+--
+-- Data for Name: tbl_players; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_players (player_id, country_id, plyr_birthdate, plyr_firstname, plyr_lastname, plyr_nickname, plyr_defposid) FROM stdin;
+100000	292	1978-01-28	Gianluigi	Buffon	\N	10
+100001	249	1987-04-07	Martín	Cáceres	\N	11
+100002	243	1983-06-26	Felipe	Melo	\N	20
+100003	292	1973-09-13	Fabio	Cannavaro	\N	11
+100004	292	1977-11-28	Fabio	Grosso	\N	11
+100005	292	1986-01-19	Claudio	Marchisio	\N	20
+100006	292	1979-11-21	Vincenzo	Iaquinta	\N	27
+100007	243	1980-06-03	Amauri	Carvalho de Oliveira	Amauri	27
+100008	292	1987-01-26	Sebastian	Giovinco	\N	27
+100009	306	1981-05-02	Tiago	Mendes	Tiago	20
+100010	292	1976-10-20	Nicola	Legrottaglie	\N	11
+100011	292	1977-06-04	Alexander	Manninger	\N	10
+100012	284	1978-07-19	Jonathan	Zebina	\N	11
+100013	292	1976-10-04	Mauro	Camoranesi	\N	20
+100014	292	1977-10-15	David	Trézéguet	\N	27
+100015	279	1980-02-28	Christian	Poulsen	\N	20
+100016	292	1983-07-30	Cristian	Molinaro	\N	11
+100017	292	1986-09-17	Paulo	De Ceglie	\N	20
+100018	284	1981-12-30	Cédric	Carrasso	\N	10
+100019	284	1901-01-01	Michaël	Ciani	\N	11
+100020	284	1981-07-15	Alou	Diarra	\N	20
+100021	243	1901-01-01	Fernando	Menegazzo	Fernando	20
+100022	284	1986-07-11	Yoann	Gourcuff	\N	20
+100023	243	1982-04-08	Wendel	Maurício	Wendel	22
+100024	278	1982-01-05	Jaroslav	Plasil	\N	20
+100025	284	1980-10-07	Matthieu	Chalmé	\N	11
+100026	284	1982-03-07	Marc	Planus	\N	11
+100027	284	1985-12-28	Benoît	Trémoulinas	\N	11
+100028	180	1984-01-10	Marouane	Chamakh	\N	27
+100029	284	1972-09-19	Ulrich	Ramé	\N	10
+100030	243	1983-05-02	Carlos	Henrique dos Santos	Henrique	11
+100031	284	1975-03-30	Franck	Jurietti	\N	11
+100032	284	1901-01-01	Yoan	Gouffran	\N	27
+100033	241	1983-09-21	Fernando	Cavenaghi	\N	27
+100034	243	1983-09-19	Jussiê	Ferreira	Jussiê	27
+100035	284	1982-11-27	David	Bellion	\N	27
+100036	292	1970-11-11	Massimiliano	Micheletti	\N	10
+100037	292	1983-04-15	Ignacio	Nardone	\N	11
+100038	292	1974-07-12	Alessio	Ballanti	\N	20
+100039	292	1974-01-11	Lorenzo	Tombetti	\N	20
+100040	292	1969-10-08	Sando	Macerata	\N	11
+100041	309	1982-10-07	Giacomo	Benedettini	\N	11
+100042	309	1981-10-10	Matteo	Andreini	\N	11
+100043	292	1978-08-16	Nicola	Canarezza	\N	20
+100044	267	1974-03-09	Altin	Lisi	\N	20
+100045	292	1983-06-06	Martín	Rodríguez	\N	20
+100046	309	1982-03-27	Federico	Amici	\N	27
+100047	309	1901-01-01	Daniel	Ceccoli	\N	10
+100048	309	1983-04-14	Alan	Toccaceli	\N	27
+100049	292	1974-03-04	Michele	Bacchiocchi	\N	11
+100050	309	1987-02-01	Michael	Simoncini	\N	20
+100051	309	1982-02-22	Federico	Macina	\N	20
+100052	309	1981-01-27	Daniele	Berardi	\N	20
+100053	292	1976-01-10	Simone	Grana	\N	20
+100054	309	1977-01-22	Alessandro	Giunta	\N	27
+100055	309	1982-01-18	Matteo	Vendemini	\N	20
+100056	314	1982-01-25	Iván	Perianes	\N	10
+100057	241	1981-01-12	Walter	Wagner	\N	11
+100058	241	1976-09-22	Christián	Xinos	\N	20
+100059	268	1982-10-05	Víctor	Moreira	\N	27
+100060	241	1976-09-22	Alejandro	Romero	\N	27
+100061	249	1983-01-28	Carlos Eduardo	Peppe	\N	20
+100062	306	1986-09-15	Manuel	Machado	\N	20
+100063	268	1981-06-02	Vicente	Muñoz	\N	11
+100064	241	1979-08-05	Luciano	Nastri	\N	11
+100065	268	1982-07-26	Daniel	Mejías	\N	20
+100066	249	1980-09-23	Sebastián	Varela	\N	11
+100067	244	1977-08-19	Guillermo	Burgos	\N	10
+100068	241	1982-11-02	Diego	Abdian	\N	11
+100069	314	1972-09-07	Josep	Matamala	\N	11
+100070	268	1901-01-01	Pablo	Pérez	\N	27
+100071	241	1976-06-24	Laureano	Miraglia	\N	20
+100072	268	1990-12-03	Xavier	Moreno	\N	11
+100073	244	1981-04-08	Juan	Bernales	\N	27
+100074	268	1988-05-13	Óscar	Vila	\N	27
+100075	306	1983-06-26	Fernando	Gonçalves	\N	27
+\.
+
+
+--
+-- Data for Name: tbl_positions; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_positions (position_id, posfield_id, posflank_id) FROM stdin;
+10	1	1
+11	8	1
+12	8	4
+13	9	1
+14	2	1
+15	2	2
+16	2	3
+17	3	1
+18	3	2
+19	3	3
+20	4	1
+21	4	4
+22	5	2
+23	5	3
+24	7	2
+25	7	4
+26	7	3
+27	6	1
+\.
+
+
+--
+-- Data for Name: tbl_referees; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_referees (referee_id, country_id, ref_birthdate, ref_firstname, ref_lastname) FROM stdin;
+1000	304	1966-06-26	Tom	Henning Øvrebø
+1001	313	1976-08-05	Damir	Skomina
+1002	280	1971-07-14	Howard	Webb
+1003	302	1966-10-13	Eric	Braamhaar
+1004	304	1965-10-05	Terje	Hauge
+1005	306	1969-10-18	Olegário	Benquerença
+1006	306	1970-11-03	Pedro	Proença
+1007	314	1967-02-20	Eduardo	Iturralde González
+1008	310	1972-07-20	Craig	Thomson
+1009	316	1969-02-06	Massimo	Bussaca
+1011	315	1974-03-28	Jonas	Eriksson
+1012	267	1967-09-15	Sokol	Jareci
+1013	276	1975-10-29	Damir	Batinić
+\.
+
+
+--
+-- Data for Name: tbl_rounds; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_rounds (round_id, round_desc) FROM stdin;
+10	Round 1
+11	Round 2
+12	Round 3
+13	Round 4
+14	Round 5
+15	Round 6
+16	Round 7
+17	Round 8
+\.
+
+
+--
+-- Data for Name: tbl_substitutions; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_substitutions (subs_id, subs_time, subs_stime) FROM stdin;
+100003	70	0
+100004	85	0
+100007	75	0
+100008	77	0
+100009	79	0
+100011	114	0
+100010	98	0
+100001	62	0
+100002	63	0
+100005	87	0
+100006	65	0
+100012	56	0
+100013	74	0
+100014	78	0
+100015	78	0
+100016	82	0
+100000	55	0
+\.
+
+
+--
+-- Data for Name: tbl_switchpositions; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_switchpositions (switch_id, lineup_id, switchposition_id, switch_time, switch_stime) FROM stdin;
+\.
+
+
+--
+-- Data for Name: tbl_teams; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_teams (team_id, country_id, tm_name) FROM stdin;
+10000	292	Juventus FC
+10001	284	FC Girondins de Bordeaux
+10002	291	Maccabi Haifa FC
+10003	286	FC Bayern München
+10004	309	SP Tre Fiori
+10005	268	UE Sant Julià
+\.
+
+
+--
+-- Data for Name: tbl_timezones; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_timezones (timezone_id, confed_id, tz_name, tz_offset) FROM stdin;
+100	15	Europe/Andorra	1.00
+101	10	Asia/Dubai	4.00
+102	10	Asia/Kabul	4.50
+103	12	America/Antigua	-4.00
+104	12	America/Anguilla	-4.00
+105	15	Europe/Tirane	1.00
+106	15	Asia/Yerevan	4.00
+107	12	America/Curacao	-4.00
+108	11	Africa/Luanda	1.00
+109	13	America/Argentina/Buenos_Aires	-3.00
+110	13	America/Argentina/Cordoba	-3.00
+111	13	America/Argentina/Salta	-3.00
+112	13	America/Argentina/Jujuy	-3.00
+113	13	America/Argentina/Tucuman	-3.00
+114	13	America/Argentina/Catamarca	-3.00
+115	13	America/Argentina/La_Rioja	-3.00
+116	13	America/Argentina/San_Juan	-3.00
+117	13	America/Argentina/Mendoza	-3.00
+118	13	America/Argentina/San_Luis	-4.00
+119	13	America/Argentina/Rio_Gallegos	-3.00
+120	13	America/Argentina/Ushuaia	-3.00
+121	14	Pacific/Pago_Pago	-11.00
+122	15	Europe/Vienna	1.00
+123	10	Australia/Lord_Howe	10.50
+124	10	Australia/Hobart	10.00
+125	10	Australia/Currie	10.00
+126	10	Australia/Melbourne	10.00
+127	10	Australia/Sydney	10.00
+128	10	Australia/Broken_Hill	9.50
+129	10	Australia/Brisbane	10.00
+130	10	Australia/Lindeman	10.00
+131	10	Australia/Adelaide	9.50
+132	10	Australia/Darwin	9.50
+133	10	Australia/Perth	8.00
+134	10	Australia/Eucla	8.75
+135	12	America/Aruba	-4.00
+136	15	Europe/Mariehamn	2.00
+137	15	Asia/Baku	4.00
+138	15	Europe/Sarajevo	1.00
+139	12	America/Barbados	-4.00
+140	10	Asia/Dhaka	6.00
+141	15	Europe/Brussels	1.00
+142	11	Africa/Ouagadougou	0.00
+143	15	Europe/Sofia	2.00
+144	10	Asia/Bahrain	3.00
+145	11	Africa/Bujumbura	2.00
+146	11	Africa/Porto-Novo	1.00
+147	12	America/St_Barthelemy	-4.00
+148	12	Atlantic/Bermuda	-4.00
+149	10	Asia/Brunei	8.00
+150	13	America/La_Paz	-4.00
+151	13	America/Noronha	-2.00
+152	13	America/Belem	-3.00
+153	13	America/Fortaleza	-3.00
+154	13	America/Recife	-3.00
+155	13	America/Araguaina	-3.00
+156	13	America/Maceio	-3.00
+157	13	America/Bahia	-3.00
+158	13	America/Sao_Paulo	-3.00
+159	13	America/Campo_Grande	-4.00
+160	13	America/Cuiaba	-4.00
+161	13	America/Santarem	-3.00
+162	13	America/Porto_Velho	-4.00
+163	13	America/Boa_Vista	-4.00
+164	13	America/Manaus	-4.00
+165	13	America/Eirunepe	-4.00
+166	13	America/Rio_Branco	-4.00
+167	12	America/Nassau	-5.00
+168	10	Asia/Thimphu	6.00
+169	11	Africa/Gaborone	2.00
+170	15	Europe/Minsk	2.00
+171	12	America/Belize	-6.00
+172	12	America/St_Johns	-3.50
+173	12	America/Halifax	-4.00
+174	12	America/Glace_Bay	-4.00
+175	12	America/Moncton	-4.00
+176	12	America/Goose_Bay	-4.00
+177	12	America/Blanc-Sablon	-4.00
+178	12	America/Montreal	-5.00
+179	12	America/Toronto	-5.00
+180	12	America/Nipigon	-5.00
+181	12	America/Thunder_Bay	-5.00
+182	12	America/Iqaluit	-5.00
+183	12	America/Pangnirtung	-5.00
+184	12	America/Resolute	-5.00
+185	12	America/Atikokan	-5.00
+186	12	America/Rankin_Inlet	-6.00
+187	12	America/Winnipeg	-6.00
+188	12	America/Rainy_River	-6.00
+189	12	America/Regina	-6.00
+190	12	America/Swift_Current	-6.00
+191	12	America/Edmonton	-7.00
+192	12	America/Cambridge_Bay	-7.00
+193	12	America/Yellowknife	-7.00
+194	12	America/Inuvik	-7.00
+195	12	America/Dawson_Creek	-7.00
+196	12	America/Vancouver	-8.00
+197	12	America/Whitehorse	-8.00
+198	12	America/Dawson	-8.00
+199	10	Indian/Cocos	6.50
+200	11	Africa/Kinshasa	1.00
+201	11	Africa/Lubumbashi	2.00
+202	11	Africa/Bangui	1.00
+203	11	Africa/Brazzaville	1.00
+204	15	Europe/Zurich	1.00
+205	11	Africa/Abidjan	0.00
+206	14	Pacific/Rarotonga	-10.00
+207	13	America/Santiago	-4.00
+208	13	Pacific/Easter	-6.00
+209	11	Africa/Douala	1.00
+210	10	Asia/Shanghai	8.00
+211	10	Asia/Harbin	8.00
+212	10	Asia/Chongqing	8.00
+213	10	Asia/Urumqi	8.00
+214	10	Asia/Kashgar	8.00
+215	13	America/Bogota	-5.00
+216	12	America/Costa_Rica	-6.00
+217	12	America/Havana	-5.00
+218	11	Atlantic/Cape_Verde	-1.00
+219	10	Indian/Christmas	7.00
+220	15	Asia/Nicosia	2.00
+221	15	Europe/Prague	1.00
+222	15	Europe/Berlin	1.00
+223	11	Africa/Djibouti	3.00
+224	15	Europe/Copenhagen	1.00
+225	12	America/Dominica	-4.00
+226	12	America/Santo_Domingo	-4.00
+227	11	Africa/Algiers	1.00
+228	13	America/Guayaquil	-5.00
+229	13	Pacific/Galapagos	-6.00
+230	15	Europe/Tallinn	2.00
+231	11	Africa/Cairo	2.00
+232	11	Africa/El_Aaiun	0.00
+233	11	Africa/Asmara	3.00
+234	15	Europe/Madrid	1.00
+235	11	Africa/Ceuta	1.00
+236	15	Atlantic/Canary	0.00
+237	11	Africa/Addis_Ababa	3.00
+238	15	Europe/Helsinki	2.00
+239	14	Pacific/Fiji	12.00
+240	14	Pacific/Truk	10.00
+241	14	Pacific/Ponape	11.00
+242	14	Pacific/Kosrae	11.00
+243	15	Atlantic/Faroe	0.00
+244	15	Europe/Paris	1.00
+245	11	Africa/Libreville	1.00
+246	15	Europe/London	0.00
+247	12	America/Grenada	-4.00
+248	15	Asia/Tbilisi	4.00
+249	12	America/Cayenne	-3.00
+250	15	Europe/Guernsey	0.00
+251	11	Africa/Accra	0.00
+252	11	Africa/Banjul	0.00
+253	11	Africa/Conakry	0.00
+254	12	America/Guadeloupe	-4.00
+255	11	Africa/Malabo	1.00
+256	15	Europe/Athens	2.00
+257	12	America/Guatemala	-6.00
+258	14	Pacific/Guam	10.00
+259	11	Africa/Bissau	0.00
+260	12	America/Guyana	-4.00
+261	10	Asia/Hong_Kong	8.00
+262	12	America/Tegucigalpa	-6.00
+263	15	Europe/Zagreb	1.00
+264	12	America/Port-au-Prince	-5.00
+265	15	Europe/Budapest	1.00
+266	10	Asia/Jakarta	7.00
+267	10	Asia/Pontianak	7.00
+268	10	Asia/Makassar	8.00
+269	10	Asia/Jayapura	9.00
+270	15	Europe/Dublin	0.00
+271	15	Asia/Jerusalem	2.00
+272	10	Asia/Kolkata	5.50
+273	10	Indian/Chagos	6.00
+274	10	Asia/Baghdad	3.00
+275	10	Asia/Tehran	3.50
+276	15	Atlantic/Reykjavik	0.00
+277	15	Europe/Rome	1.00
+278	12	America/Jamaica	-5.00
+279	10	Asia/Amman	2.00
+280	10	Asia/Tokyo	9.00
+281	11	Africa/Nairobi	3.00
+282	10	Asia/Bishkek	6.00
+283	10	Asia/Phnom_Penh	7.00
+284	14	Pacific/Tarawa	12.00
+285	14	Pacific/Enderbury	13.00
+286	14	Pacific/Kiritimati	14.00
+287	11	Indian/Comoro	3.00
+288	12	America/St_Kitts	-4.00
+289	10	Asia/Pyongyang	9.00
+290	10	Asia/Seoul	9.00
+291	10	Asia/Kuwait	3.00
+292	12	America/Cayman	-5.00
+293	10	Asia/Almaty	6.00
+294	10	Asia/Qyzylorda	6.00
+295	10	Asia/Aqtobe	5.00
+296	10	Asia/Aqtau	5.00
+297	10	Asia/Oral	5.00
+298	10	Asia/Vientiane	7.00
+299	10	Asia/Beirut	2.00
+300	12	America/St_Lucia	-4.00
+301	15	Europe/Vaduz	1.00
+302	10	Asia/Colombo	5.50
+303	11	Africa/Monrovia	0.00
+304	11	Africa/Maseru	2.00
+305	15	Europe/Vilnius	2.00
+306	15	Europe/Luxembourg	1.00
+307	15	Europe/Riga	2.00
+308	11	Africa/Tripoli	2.00
+309	11	Africa/Casablanca	0.00
+310	15	Europe/Monaco	1.00
+311	15	Europe/Chisinau	2.00
+312	15	Europe/Podgorica	1.00
+313	12	America/Marigot	-4.00
+314	11	Indian/Antananarivo	3.00
+315	14	Pacific/Majuro	12.00
+316	14	Pacific/Kwajalein	12.00
+317	15	Europe/Skopje	1.00
+318	11	Africa/Bamako	0.00
+319	10	Asia/Rangoon	6.50
+320	10	Asia/Ulaanbaatar	8.00
+321	10	Asia/Hovd	7.00
+322	10	Asia/Choibalsan	8.00
+323	10	Asia/Macau	8.00
+324	14	Pacific/Saipan	10.00
+325	12	America/Martinique	-4.00
+326	11	Africa/Nouakchott	0.00
+327	12	America/Montserrat	-4.00
+328	15	Europe/Malta	1.00
+329	11	Indian/Mauritius	4.00
+330	10	Indian/Maldives	5.00
+331	11	Africa/Blantyre	2.00
+332	12	America/Mexico_City	-6.00
+333	12	America/Cancun	-6.00
+334	12	America/Merida	-6.00
+335	12	America/Monterrey	-6.00
+336	12	America/Matamoros	-6.00
+337	12	America/Mazatlan	-7.00
+338	12	America/Chihuahua	-7.00
+339	12	America/Ojinaga	-7.00
+340	12	America/Hermosillo	-7.00
+341	12	America/Tijuana	-8.00
+342	12	America/Santa_Isabel	-8.00
+343	10	Asia/Kuala_Lumpur	8.00
+344	10	Asia/Kuching	8.00
+345	11	Africa/Maputo	2.00
+346	11	Africa/Windhoek	1.00
+347	14	Pacific/Noumea	11.00
+348	11	Africa/Niamey	1.00
+349	11	Africa/Lagos	1.00
+350	12	America/Managua	-6.00
+351	15	Europe/Amsterdam	1.00
+352	15	Europe/Oslo	1.00
+353	10	Asia/Kathmandu	5.75
+354	14	Pacific/Nauru	12.00
+355	14	Pacific/Niue	-11.00
+356	14	Pacific/Auckland	12.00
+357	14	Pacific/Chatham	12.75
+358	10	Asia/Muscat	4.00
+359	12	America/Panama	-5.00
+360	12	America/Lima	-5.00
+361	14	Pacific/Tahiti	-10.00
+362	14	Pacific/Marquesas	-9.50
+363	14	Pacific/Gambier	-9.00
+364	10	Pacific/Port_Moresby	10.00
+365	10	Asia/Manila	8.00
+366	10	Asia/Karachi	6.00
+367	15	Europe/Warsaw	1.00
+368	12	America/Miquelon	-3.00
+369	12	America/Puerto_Rico	-4.00
+370	10	Asia/Gaza	2.00
+371	15	Europe/Lisbon	0.00
+372	15	Atlantic/Madeira	0.00
+373	15	Atlantic/Azores	-1.00
+374	14	Pacific/Palau	9.00
+375	12	America/Asuncion	-4.00
+376	10	Asia/Qatar	3.00
+377	10	Indian/Reunion	4.00
+378	15	Europe/Bucharest	2.00
+379	15	Europe/Belgrade	1.00
+380	15	Europe/Kaliningrad	3.00
+381	15	Europe/Moscow	4.00
+382	15	Europe/Volgograd	4.00
+383	15	Europe/Samara	4.00
+384	15	Asia/Yekaterinburg	6.00
+385	15	Asia/Omsk	7.00
+386	15	Asia/Novosibirsk	7.00
+387	15	Asia/Novokuznetsk	7.00
+388	15	Asia/Krasnoyarsk	8.00
+389	15	Asia/Irkutsk	9.00
+390	15	Asia/Yakutsk	10.00
+391	15	Asia/Vladivostok	11.00
+392	15	Asia/Sakhalin	11.00
+393	15	Asia/Magadan	12.00
+394	15	Asia/Kamchatka	12.00
+395	15	Asia/Anadyr	12.00
+396	11	Africa/Kigali	2.00
+397	10	Asia/Riyadh	3.00
+398	14	Pacific/Guadalcanal	11.00
+399	10	Indian/Mahe	4.00
+400	11	Africa/Khartoum	3.00
+401	15	Europe/Stockholm	1.00
+402	10	Asia/Singapore	8.00
+403	15	Europe/Ljubljana	1.00
+404	15	Europe/Bratislava	1.00
+405	11	Africa/Freetown	0.00
+406	15	Europe/San_Marino	1.00
+407	11	Africa/Dakar	0.00
+408	11	Africa/Mogadishu	3.00
+409	12	America/Paramaribo	-3.00
+410	11	Africa/Sao_Tome	0.00
+411	12	America/El_Salvador	-6.00
+412	10	Asia/Damascus	2.00
+413	11	Africa/Mbabane	2.00
+414	12	America/Grand_Turk	-5.00
+415	11	Africa/Ndjamena	1.00
+416	10	Indian/Kerguelen	5.00
+417	11	Africa/Lome	0.00
+418	10	Asia/Bangkok	7.00
+419	10	Asia/Dushanbe	5.00
+420	14	Pacific/Fakaofo	-10.00
+421	10	Asia/Dili	9.00
+422	10	Asia/Ashgabat	5.00
+423	11	Africa/Tunis	1.00
+424	14	Pacific/Tongatapu	13.00
+425	15	Europe/Istanbul	2.00
+426	12	America/Port_of_Spain	-4.00
+427	14	Pacific/Funafuti	12.00
+428	10	Asia/Taipei	8.00
+429	11	Africa/Dar_es_Salaam	3.00
+430	15	Europe/Kiev	2.00
+431	15	Europe/Uzhgorod	2.00
+432	15	Europe/Zaporozhye	2.00
+433	15	Europe/Simferopol	2.00
+434	11	Africa/Kampala	3.00
+435	14	Pacific/Johnston	-10.00
+436	14	Pacific/Midway	-11.00
+437	14	Pacific/Wake	12.00
+438	12	America/New_York	-5.00
+439	12	America/Detroit	-5.00
+440	12	America/Kentucky/Louisville	-5.00
+441	12	America/Kentucky/Monticello	-5.00
+442	12	America/Indiana/Indianapolis	-5.00
+443	12	America/Indiana/Vincennes	-5.00
+444	12	America/Indiana/Winamac	-5.00
+445	12	America/Indiana/Marengo	-5.00
+446	12	America/Indiana/Petersburg	-5.00
+447	12	America/Indiana/Vevay	-5.00
+448	12	America/Chicago	-6.00
+449	12	America/Indiana/Tell_City	-6.00
+450	12	America/Indiana/Knox	-6.00
+451	12	America/Menominee	-6.00
+452	12	America/North_Dakota/Center	-6.00
+453	12	America/North_Dakota/New_Salem	-6.00
+454	12	America/Denver	-7.00
+455	12	America/Boise	-7.00
+456	12	America/Shiprock	-7.00
+457	12	America/Phoenix	-7.00
+458	12	America/Los_Angeles	-8.00
+459	12	America/Anchorage	-9.00
+460	12	America/Juneau	-9.00
+461	12	America/Yakutat	-9.00
+462	12	America/Nome	-9.00
+463	12	America/Adak	-10.00
+464	12	Pacific/Honolulu	-10.00
+465	13	America/Montevideo	-3.00
+466	10	Asia/Samarkand	5.00
+467	10	Asia/Tashkent	5.00
+468	12	America/St_Vincent	-4.00
+469	13	America/Caracas	-4.50
+470	12	America/Tortola	-4.00
+471	12	America/St_Thomas	-4.00
+472	10	Asia/Ho_Chi_Minh	7.00
+473	14	Pacific/Efate	11.00
+474	14	Pacific/Wallis	12.00
+475	14	Pacific/Apia	-11.00
+476	10	Asia/Aden	3.00
+477	10	Indian/Mayotte	3.00
+478	11	Africa/Johannesburg	2.00
+479	11	Africa/Lusaka	2.00
+480	11	Africa/Harare	2.00
+\.
+
+
+--
+-- Data for Name: tbl_venuehistory; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_venuehistory (venuehistory_id, venue_id, venuehist_date, venuesurface_id, venue_length, venue_width, venuehist_capacity, venuehist_seats) FROM stdin;
+\.
+
+
+--
+-- Data for Name: tbl_venues; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_venues (venue_id, team_id, country_id, timezone_id, ven_city, ven_name, ven_altitude, ven_latitude, ven_longitude) FROM stdin;
+1000	10000	292	277	Turin	Stadio Olimpico di Torino	246	45.041752	7.650014
+1004	10004	309	406	Fiorentino	Stadio di Fiorentino	490	43.910557	12.455556
+1003	10003	286	222	Munich	Allianz Arena	519	48.218777	11.624753
+1001	10001	284	244	Bordeaux	Stade Chaban-Delmas	16	44.829166	-0.597778
+1002	10002	291	271	Ramat Gan	Ramat Gan Stadium	65	32.100277	34.824165
+1005	10005	268	100	Sant Julià de Lòria	DEVK-Arena	908	42.465000	1.491111
+\.
+
+
+--
+-- Data for Name: tbl_venuesurfaces; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_venuesurfaces (venuesurface_id, vensurf_desc) FROM stdin;
+1	AstroTurf Gen 1
+2	AstroTurf Gen 2
+3	FieldTurf
+4	Other artificial
+5	Mixed grass/artificial
+6	Natural grass
+\.
+
+
+--
+-- Data for Name: tbl_weather; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_weather (weather_id, wx_conditiondesc) FROM stdin;
+10	Clear 
+11	Mostly Cloudy 
+12	Few Clouds 
+13	Hot and Dry 
+14	Hot and Humid 
+15	Partly Cloudy 
+16	Overcast 
+17	Fog/Mist 
+18	Light Rain 
+19	Heavy Rain 
+20	Clear and Windy 
+21	Partly Cloudy and Windy 
+22	Mostly Cloudy and Windy 
+23	Overcast and Windy 
+24	Snow Flurries 
+25	Light Snow 
+26	Heavy Snow 
+\.
+
+
+--
+-- Data for Name: tbl_weatherfulltime; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_weatherfulltime (enviro_id, weather_id) FROM stdin;
+1000000	10
+1000001	15
+\.
+
+
+--
+-- Data for Name: tbl_weatherhalftime; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_weatherhalftime (enviro_id, weather_id) FROM stdin;
+1000000	10
+1000001	15
+\.
+
+
+--
+-- Data for Name: tbl_weatherkickoff; Type: TABLE DATA; Schema: public; Owner: howard
+--
+
+COPY tbl_weatherkickoff (enviro_id, weather_id) FROM stdin;
+1000000	10
+1000001	15
+\.
+
+
+--
+-- Name: tbl_awaymanagers_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_awaymanagers
+    ADD CONSTRAINT tbl_awaymanagers_pkey PRIMARY KEY (match_id, manager_id);
+
+
+--
+-- Name: tbl_awayteams_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_awayteams
+    ADD CONSTRAINT tbl_awayteams_pkey PRIMARY KEY (match_id, team_id);
+
+
+--
+-- Name: tbl_cards_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_cards
+    ADD CONSTRAINT tbl_cards_pkey PRIMARY KEY (card_id);
+
+
+--
+-- Name: tbl_competitions_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_competitions
+    ADD CONSTRAINT tbl_competitions_pkey PRIMARY KEY (competition_id);
+
+
+--
+-- Name: tbl_confederations_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_confederations
+    ADD CONSTRAINT tbl_confederations_pkey PRIMARY KEY (confed_id);
+
+
+--
+-- Name: tbl_countries_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_countries
+    ADD CONSTRAINT tbl_countries_pkey PRIMARY KEY (country_id);
+
+
+--
+-- Name: tbl_environments_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_environments
+    ADD CONSTRAINT tbl_environments_pkey PRIMARY KEY (enviro_id);
+
+
+--
+-- Name: tbl_fieldnames_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_fieldnames
+    ADD CONSTRAINT tbl_fieldnames_pkey PRIMARY KEY (posfield_id);
+
+
+--
+-- Name: tbl_flanknames_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_flanknames
+    ADD CONSTRAINT tbl_flanknames_pkey PRIMARY KEY (posflank_id);
+
+
+--
+-- Name: tbl_fouls_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_fouls
+    ADD CONSTRAINT tbl_fouls_pkey PRIMARY KEY (foul_id);
+
+
+--
+-- Name: tbl_goalevents_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_goalevents
+    ADD CONSTRAINT tbl_goalevents_pkey PRIMARY KEY (gtetype_id);
+
+
+--
+-- Name: tbl_goals_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_goals
+    ADD CONSTRAINT tbl_goals_pkey PRIMARY KEY (goal_id);
+
+
+--
+-- Name: tbl_goalstrikes_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_goalstrikes
+    ADD CONSTRAINT tbl_goalstrikes_pkey PRIMARY KEY (gtstype_id);
+
+
+--
+-- Name: tbl_groupmatches_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_groupmatches
+    ADD CONSTRAINT tbl_groupmatches_pkey PRIMARY KEY (match_id, grpround_id, group_id, round_id);
+
+
+--
+-- Name: tbl_grouprounds_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_grouprounds
+    ADD CONSTRAINT tbl_grouprounds_pkey PRIMARY KEY (grpround_id);
+
+
+--
+-- Name: tbl_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_groups
+    ADD CONSTRAINT tbl_groups_pkey PRIMARY KEY (group_id);
+
+
+--
+-- Name: tbl_homemanagers_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_homemanagers
+    ADD CONSTRAINT tbl_homemanagers_pkey PRIMARY KEY (match_id, manager_id);
+
+
+--
+-- Name: tbl_hometeams_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_hometeams
+    ADD CONSTRAINT tbl_hometeams_pkey PRIMARY KEY (match_id, team_id);
+
+
+--
+-- Name: tbl_insubstitutions_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_insubstitutions
+    ADD CONSTRAINT tbl_insubstitutions_pkey PRIMARY KEY (subs_id, lineup_id);
+
+
+--
+-- Name: tbl_knockoutmatches_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_knockoutmatches
+    ADD CONSTRAINT tbl_knockoutmatches_pkey PRIMARY KEY (match_id, koround_id, matchday_id);
+
+
+--
+-- Name: tbl_knockoutrounds_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_knockoutrounds
+    ADD CONSTRAINT tbl_knockoutrounds_pkey PRIMARY KEY (koround_id);
+
+
+--
+-- Name: tbl_leaguematches_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_leaguematches
+    ADD CONSTRAINT tbl_leaguematches_pkey PRIMARY KEY (match_id, round_id);
+
+
+--
+-- Name: tbl_lineups_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_lineups
+    ADD CONSTRAINT tbl_lineups_pkey PRIMARY KEY (lineup_id);
+
+
+--
+-- Name: tbl_managers_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_managers
+    ADD CONSTRAINT tbl_managers_pkey PRIMARY KEY (manager_id);
+
+
+--
+-- Name: tbl_matchdays_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_matchdays
+    ADD CONSTRAINT tbl_matchdays_pkey PRIMARY KEY (matchday_id);
+
+
+--
+-- Name: tbl_matches_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_matches
+    ADD CONSTRAINT tbl_matches_pkey PRIMARY KEY (match_id);
+
+
+--
+-- Name: tbl_offenses_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_offenses
+    ADD CONSTRAINT tbl_offenses_pkey PRIMARY KEY (offense_id);
+
+
+--
+-- Name: tbl_outsubstitutions_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_outsubstitutions
+    ADD CONSTRAINT tbl_outsubstitutions_pkey PRIMARY KEY (subs_id, lineup_id);
+
+
+--
+-- Name: tbl_penalties_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_penalties
+    ADD CONSTRAINT tbl_penalties_pkey PRIMARY KEY (penalty_id);
+
+
+--
+-- Name: tbl_penaltyshootouts_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_penaltyshootouts
+    ADD CONSTRAINT tbl_penaltyshootouts_pkey PRIMARY KEY (penshootout_id);
+
+
+--
+-- Name: tbl_penoutcomes_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_penoutcomes
+    ADD CONSTRAINT tbl_penoutcomes_pkey PRIMARY KEY (penoutcome_id);
+
+
+--
+-- Name: tbl_penshootoutopeners_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_penshootoutopeners
+    ADD CONSTRAINT tbl_penshootoutopeners_pkey PRIMARY KEY (match_id, team_id);
+
+
+--
+-- Name: tbl_phases_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_phases
+    ADD CONSTRAINT tbl_phases_pkey PRIMARY KEY (phase_id);
+
+
+--
+-- Name: tbl_playerhistory_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_playerhistory
+    ADD CONSTRAINT tbl_playerhistory_pkey PRIMARY KEY (playerhistory_id);
+
+
+--
+-- Name: tbl_players_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_players
+    ADD CONSTRAINT tbl_players_pkey PRIMARY KEY (player_id);
+
+
+--
+-- Name: tbl_positions_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_positions
+    ADD CONSTRAINT tbl_positions_pkey PRIMARY KEY (position_id);
+
+
+--
+-- Name: tbl_referees_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_referees
+    ADD CONSTRAINT tbl_referees_pkey PRIMARY KEY (referee_id);
+
+
+--
+-- Name: tbl_rounds_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_rounds
+    ADD CONSTRAINT tbl_rounds_pkey PRIMARY KEY (round_id);
+
+
+--
+-- Name: tbl_substitutions_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_substitutions
+    ADD CONSTRAINT tbl_substitutions_pkey PRIMARY KEY (subs_id);
+
+
+--
+-- Name: tbl_switchpositions_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_switchpositions
+    ADD CONSTRAINT tbl_switchpositions_pkey PRIMARY KEY (switch_id);
+
+
+--
+-- Name: tbl_teams_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_teams
+    ADD CONSTRAINT tbl_teams_pkey PRIMARY KEY (team_id);
+
+
+--
+-- Name: tbl_timezones_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_timezones
+    ADD CONSTRAINT tbl_timezones_pkey PRIMARY KEY (timezone_id);
+
+
+--
+-- Name: tbl_venuehistory_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_venuehistory
+    ADD CONSTRAINT tbl_venuehistory_pkey PRIMARY KEY (venuehistory_id);
+
+
+--
+-- Name: tbl_venues_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_venues
+    ADD CONSTRAINT tbl_venues_pkey PRIMARY KEY (venue_id);
+
+
+--
+-- Name: tbl_venuesurfaces_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_venuesurfaces
+    ADD CONSTRAINT tbl_venuesurfaces_pkey PRIMARY KEY (venuesurface_id);
+
+
+--
+-- Name: tbl_weather_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_weather
+    ADD CONSTRAINT tbl_weather_pkey PRIMARY KEY (weather_id);
+
+
+--
+-- Name: tbl_weatherfulltime_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_weatherfulltime
+    ADD CONSTRAINT tbl_weatherfulltime_pkey PRIMARY KEY (enviro_id, weather_id);
+
+
+--
+-- Name: tbl_weatherhalftime_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_weatherhalftime
+    ADD CONSTRAINT tbl_weatherhalftime_pkey PRIMARY KEY (enviro_id, weather_id);
+
+
+--
+-- Name: tbl_weatherkickoff_pkey; Type: CONSTRAINT; Schema: public; Owner: howard; Tablespace: 
+--
+
+ALTER TABLE ONLY tbl_weatherkickoff
+    ADD CONSTRAINT tbl_weatherkickoff_pkey PRIMARY KEY (enviro_id, weather_id);
+
+
+--
+-- Name: tbl_awaymanagers_manager_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_awaymanagers
+    ADD CONSTRAINT tbl_awaymanagers_manager_id_fkey FOREIGN KEY (manager_id) REFERENCES tbl_managers(manager_id);
+
+
+--
+-- Name: tbl_awaymanagers_match_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_awaymanagers
+    ADD CONSTRAINT tbl_awaymanagers_match_id_fkey FOREIGN KEY (match_id) REFERENCES tbl_matches(match_id);
+
+
+--
+-- Name: tbl_awayteams_match_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_awayteams
+    ADD CONSTRAINT tbl_awayteams_match_id_fkey FOREIGN KEY (match_id) REFERENCES tbl_matches(match_id);
+
+
+--
+-- Name: tbl_awayteams_team_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_awayteams
+    ADD CONSTRAINT tbl_awayteams_team_id_fkey FOREIGN KEY (team_id) REFERENCES tbl_teams(team_id);
+
+
+--
+-- Name: tbl_countries_confed_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_countries
+    ADD CONSTRAINT tbl_countries_confed_id_fkey FOREIGN KEY (confed_id) REFERENCES tbl_confederations(confed_id);
+
+
+--
+-- Name: tbl_environments_match_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_environments
+    ADD CONSTRAINT tbl_environments_match_id_fkey FOREIGN KEY (match_id) REFERENCES tbl_matches(match_id);
+
+
+--
+-- Name: tbl_goals_gtetype_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_goals
+    ADD CONSTRAINT tbl_goals_gtetype_id_fkey FOREIGN KEY (gtetype_id) REFERENCES tbl_goalevents(gtetype_id);
+
+
+--
+-- Name: tbl_goals_gtstype_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_goals
+    ADD CONSTRAINT tbl_goals_gtstype_id_fkey FOREIGN KEY (gtstype_id) REFERENCES tbl_goalstrikes(gtstype_id);
+
+
+--
+-- Name: tbl_goals_lineup_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_goals
+    ADD CONSTRAINT tbl_goals_lineup_id_fkey FOREIGN KEY (lineup_id) REFERENCES tbl_lineups(lineup_id);
+
+
+--
+-- Name: tbl_goals_team_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_goals
+    ADD CONSTRAINT tbl_goals_team_id_fkey FOREIGN KEY (team_id) REFERENCES tbl_teams(team_id);
+
+
+--
+-- Name: tbl_groupmatches_group_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_groupmatches
+    ADD CONSTRAINT tbl_groupmatches_group_id_fkey FOREIGN KEY (group_id) REFERENCES tbl_groups(group_id);
+
+
+--
+-- Name: tbl_groupmatches_grpround_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_groupmatches
+    ADD CONSTRAINT tbl_groupmatches_grpround_id_fkey FOREIGN KEY (grpround_id) REFERENCES tbl_grouprounds(grpround_id);
+
+
+--
+-- Name: tbl_groupmatches_match_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_groupmatches
+    ADD CONSTRAINT tbl_groupmatches_match_id_fkey FOREIGN KEY (match_id) REFERENCES tbl_matches(match_id);
+
+
+--
+-- Name: tbl_groupmatches_round_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_groupmatches
+    ADD CONSTRAINT tbl_groupmatches_round_id_fkey FOREIGN KEY (round_id) REFERENCES tbl_rounds(round_id);
+
+
+--
+-- Name: tbl_homemanagers_manager_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_homemanagers
+    ADD CONSTRAINT tbl_homemanagers_manager_id_fkey FOREIGN KEY (manager_id) REFERENCES tbl_managers(manager_id);
+
+
+--
+-- Name: tbl_homemanagers_match_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_homemanagers
+    ADD CONSTRAINT tbl_homemanagers_match_id_fkey FOREIGN KEY (match_id) REFERENCES tbl_matches(match_id);
+
+
+--
+-- Name: tbl_hometeams_match_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_hometeams
+    ADD CONSTRAINT tbl_hometeams_match_id_fkey FOREIGN KEY (match_id) REFERENCES tbl_matches(match_id);
+
+
+--
+-- Name: tbl_hometeams_team_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_hometeams
+    ADD CONSTRAINT tbl_hometeams_team_id_fkey FOREIGN KEY (team_id) REFERENCES tbl_teams(team_id);
+
+
+--
+-- Name: tbl_insubstitutions_lineup_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_insubstitutions
+    ADD CONSTRAINT tbl_insubstitutions_lineup_id_fkey FOREIGN KEY (lineup_id) REFERENCES tbl_lineups(lineup_id);
+
+
+--
+-- Name: tbl_insubstitutions_subs_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_insubstitutions
+    ADD CONSTRAINT tbl_insubstitutions_subs_id_fkey FOREIGN KEY (subs_id) REFERENCES tbl_substitutions(subs_id);
+
+
+--
+-- Name: tbl_knockoutmatches_koround_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_knockoutmatches
+    ADD CONSTRAINT tbl_knockoutmatches_koround_id_fkey FOREIGN KEY (koround_id) REFERENCES tbl_knockoutrounds(koround_id);
+
+
+--
+-- Name: tbl_knockoutmatches_match_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_knockoutmatches
+    ADD CONSTRAINT tbl_knockoutmatches_match_id_fkey FOREIGN KEY (match_id) REFERENCES tbl_matches(match_id);
+
+
+--
+-- Name: tbl_knockoutmatches_matchday_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_knockoutmatches
+    ADD CONSTRAINT tbl_knockoutmatches_matchday_id_fkey FOREIGN KEY (matchday_id) REFERENCES tbl_matchdays(matchday_id);
+
+
+--
+-- Name: tbl_leaguematches_match_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_leaguematches
+    ADD CONSTRAINT tbl_leaguematches_match_id_fkey FOREIGN KEY (match_id) REFERENCES tbl_matches(match_id);
+
+
+--
+-- Name: tbl_leaguematches_round_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_leaguematches
+    ADD CONSTRAINT tbl_leaguematches_round_id_fkey FOREIGN KEY (round_id) REFERENCES tbl_rounds(round_id);
+
+
+--
+-- Name: tbl_lineups_match_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_lineups
+    ADD CONSTRAINT tbl_lineups_match_id_fkey FOREIGN KEY (match_id) REFERENCES tbl_matches(match_id);
+
+
+--
+-- Name: tbl_lineups_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_lineups
+    ADD CONSTRAINT tbl_lineups_player_id_fkey FOREIGN KEY (player_id) REFERENCES tbl_players(player_id);
+
+
+--
+-- Name: tbl_lineups_position_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_lineups
+    ADD CONSTRAINT tbl_lineups_position_id_fkey FOREIGN KEY (position_id) REFERENCES tbl_positions(position_id);
+
+
+--
+-- Name: tbl_lineups_team_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_lineups
+    ADD CONSTRAINT tbl_lineups_team_id_fkey FOREIGN KEY (team_id) REFERENCES tbl_teams(team_id);
+
+
+--
+-- Name: tbl_managers_country_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_managers
+    ADD CONSTRAINT tbl_managers_country_id_fkey FOREIGN KEY (country_id) REFERENCES tbl_countries(country_id);
+
+
+--
+-- Name: tbl_matches_competition_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_matches
+    ADD CONSTRAINT tbl_matches_competition_id_fkey FOREIGN KEY (competition_id) REFERENCES tbl_competitions(competition_id);
+
+
+--
+-- Name: tbl_matches_phase_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_matches
+    ADD CONSTRAINT tbl_matches_phase_id_fkey FOREIGN KEY (phase_id) REFERENCES tbl_phases(phase_id);
+
+
+--
+-- Name: tbl_matches_referee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_matches
+    ADD CONSTRAINT tbl_matches_referee_id_fkey FOREIGN KEY (referee_id) REFERENCES tbl_referees(referee_id);
+
+
+--
+-- Name: tbl_matches_venue_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_matches
+    ADD CONSTRAINT tbl_matches_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES tbl_venues(venue_id);
+
+
+--
+-- Name: tbl_offenses_card_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_offenses
+    ADD CONSTRAINT tbl_offenses_card_id_fkey FOREIGN KEY (card_id) REFERENCES tbl_cards(card_id);
+
+
+--
+-- Name: tbl_offenses_foul_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_offenses
+    ADD CONSTRAINT tbl_offenses_foul_id_fkey FOREIGN KEY (foul_id) REFERENCES tbl_fouls(foul_id);
+
+
+--
+-- Name: tbl_offenses_lineup_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_offenses
+    ADD CONSTRAINT tbl_offenses_lineup_id_fkey FOREIGN KEY (lineup_id) REFERENCES tbl_lineups(lineup_id);
+
+
+--
+-- Name: tbl_outsubstitutions_lineup_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_outsubstitutions
+    ADD CONSTRAINT tbl_outsubstitutions_lineup_id_fkey FOREIGN KEY (lineup_id) REFERENCES tbl_lineups(lineup_id);
+
+
+--
+-- Name: tbl_outsubstitutions_subs_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_outsubstitutions
+    ADD CONSTRAINT tbl_outsubstitutions_subs_id_fkey FOREIGN KEY (subs_id) REFERENCES tbl_substitutions(subs_id);
+
+
+--
+-- Name: tbl_penalties_foul_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_penalties
+    ADD CONSTRAINT tbl_penalties_foul_id_fkey FOREIGN KEY (foul_id) REFERENCES tbl_fouls(foul_id);
+
+
+--
+-- Name: tbl_penalties_lineup_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_penalties
+    ADD CONSTRAINT tbl_penalties_lineup_id_fkey FOREIGN KEY (lineup_id) REFERENCES tbl_lineups(lineup_id);
+
+
+--
+-- Name: tbl_penalties_penoutcome_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_penalties
+    ADD CONSTRAINT tbl_penalties_penoutcome_id_fkey FOREIGN KEY (penoutcome_id) REFERENCES tbl_penoutcomes(penoutcome_id);
+
+
+--
+-- Name: tbl_penaltyshootouts_lineup_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_penaltyshootouts
+    ADD CONSTRAINT tbl_penaltyshootouts_lineup_id_fkey FOREIGN KEY (lineup_id) REFERENCES tbl_lineups(lineup_id);
+
+
+--
+-- Name: tbl_penaltyshootouts_penoutcome_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_penaltyshootouts
+    ADD CONSTRAINT tbl_penaltyshootouts_penoutcome_id_fkey FOREIGN KEY (penoutcome_id) REFERENCES tbl_penoutcomes(penoutcome_id);
+
+
+--
+-- Name: tbl_penaltyshootouts_round_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_penaltyshootouts
+    ADD CONSTRAINT tbl_penaltyshootouts_round_id_fkey FOREIGN KEY (round_id) REFERENCES tbl_rounds(round_id);
+
+
+--
+-- Name: tbl_penshootoutopeners_match_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_penshootoutopeners
+    ADD CONSTRAINT tbl_penshootoutopeners_match_id_fkey FOREIGN KEY (match_id) REFERENCES tbl_matches(match_id);
+
+
+--
+-- Name: tbl_penshootoutopeners_team_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_penshootoutopeners
+    ADD CONSTRAINT tbl_penshootoutopeners_team_id_fkey FOREIGN KEY (team_id) REFERENCES tbl_teams(team_id);
+
+
+--
+-- Name: tbl_playerhistory_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_playerhistory
+    ADD CONSTRAINT tbl_playerhistory_player_id_fkey FOREIGN KEY (player_id) REFERENCES tbl_players(player_id);
+
+
+--
+-- Name: tbl_players_country_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_players
+    ADD CONSTRAINT tbl_players_country_id_fkey FOREIGN KEY (country_id) REFERENCES tbl_countries(country_id);
+
+
+--
+-- Name: tbl_players_plyr_defposid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_players
+    ADD CONSTRAINT tbl_players_plyr_defposid_fkey FOREIGN KEY (plyr_defposid) REFERENCES tbl_positions(position_id);
+
+
+--
+-- Name: tbl_positions_posfield_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_positions
+    ADD CONSTRAINT tbl_positions_posfield_id_fkey FOREIGN KEY (posfield_id) REFERENCES tbl_fieldnames(posfield_id);
+
+
+--
+-- Name: tbl_positions_posflank_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_positions
+    ADD CONSTRAINT tbl_positions_posflank_id_fkey FOREIGN KEY (posflank_id) REFERENCES tbl_flanknames(posflank_id);
+
+
+--
+-- Name: tbl_referees_country_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_referees
+    ADD CONSTRAINT tbl_referees_country_id_fkey FOREIGN KEY (country_id) REFERENCES tbl_countries(country_id);
+
+
+--
+-- Name: tbl_switchpositions_lineup_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_switchpositions
+    ADD CONSTRAINT tbl_switchpositions_lineup_id_fkey FOREIGN KEY (lineup_id) REFERENCES tbl_lineups(lineup_id);
+
+
+--
+-- Name: tbl_switchpositions_switchposition_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_switchpositions
+    ADD CONSTRAINT tbl_switchpositions_switchposition_id_fkey FOREIGN KEY (switchposition_id) REFERENCES tbl_positions(position_id);
+
+
+--
+-- Name: tbl_teams_country_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_teams
+    ADD CONSTRAINT tbl_teams_country_id_fkey FOREIGN KEY (country_id) REFERENCES tbl_countries(country_id);
+
+
+--
+-- Name: tbl_timezones_confed_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_timezones
+    ADD CONSTRAINT tbl_timezones_confed_id_fkey FOREIGN KEY (confed_id) REFERENCES tbl_confederations(confed_id);
+
+
+--
+-- Name: tbl_venuehistory_venue_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_venuehistory
+    ADD CONSTRAINT tbl_venuehistory_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES tbl_venues(venue_id);
+
+
+--
+-- Name: tbl_venuehistory_venuesurface_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_venuehistory
+    ADD CONSTRAINT tbl_venuehistory_venuesurface_id_fkey FOREIGN KEY (venuesurface_id) REFERENCES tbl_venuesurfaces(venuesurface_id);
+
+
+--
+-- Name: tbl_venues_country_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_venues
+    ADD CONSTRAINT tbl_venues_country_id_fkey FOREIGN KEY (country_id) REFERENCES tbl_countries(country_id);
+
+
+--
+-- Name: tbl_venues_team_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_venues
+    ADD CONSTRAINT tbl_venues_team_id_fkey FOREIGN KEY (team_id) REFERENCES tbl_teams(team_id);
+
+
+--
+-- Name: tbl_venues_timezone_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_venues
+    ADD CONSTRAINT tbl_venues_timezone_id_fkey FOREIGN KEY (timezone_id) REFERENCES tbl_timezones(timezone_id);
+
+
+--
+-- Name: tbl_weatherfulltime_enviro_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_weatherfulltime
+    ADD CONSTRAINT tbl_weatherfulltime_enviro_id_fkey FOREIGN KEY (enviro_id) REFERENCES tbl_environments(enviro_id);
+
+
+--
+-- Name: tbl_weatherfulltime_weather_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_weatherfulltime
+    ADD CONSTRAINT tbl_weatherfulltime_weather_id_fkey FOREIGN KEY (weather_id) REFERENCES tbl_weather(weather_id);
+
+
+--
+-- Name: tbl_weatherhalftime_enviro_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_weatherhalftime
+    ADD CONSTRAINT tbl_weatherhalftime_enviro_id_fkey FOREIGN KEY (enviro_id) REFERENCES tbl_environments(enviro_id);
+
+
+--
+-- Name: tbl_weatherhalftime_weather_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_weatherhalftime
+    ADD CONSTRAINT tbl_weatherhalftime_weather_id_fkey FOREIGN KEY (weather_id) REFERENCES tbl_weather(weather_id);
+
+
+--
+-- Name: tbl_weatherkickoff_enviro_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_weatherkickoff
+    ADD CONSTRAINT tbl_weatherkickoff_enviro_id_fkey FOREIGN KEY (enviro_id) REFERENCES tbl_environments(enviro_id);
+
+
+--
+-- Name: tbl_weatherkickoff_weather_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: howard
+--
+
+ALTER TABLE ONLY tbl_weatherkickoff
+    ADD CONSTRAINT tbl_weatherkickoff_weather_id_fkey FOREIGN KEY (weather_id) REFERENCES tbl_weather(weather_id);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
