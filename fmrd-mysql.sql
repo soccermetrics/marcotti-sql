@@ -117,7 +117,7 @@ CREATE TABLE tbl_timezones (
     tz_name         varchar(80) NOT NULL,
     tz_offset       numeric(4,2) DEFAULT 0 CHECK (tz_offset >= -12.0 AND tz_offset <= 14.0),
     PRIMARY KEY (timezone_id),
-    FOREIGN KEY (confed_id) REFERENCES tbl_confederations (confed_id),
+    FOREIGN KEY (confed_id) REFERENCES tbl_confederations (confed_id)
     ) CHARACTER SET utf8 ENGINE=InnoDB;
 ALTER TABLE tbl_timezones AUTO_INCREMENT=100;
 
@@ -328,7 +328,7 @@ CREATE TABLE tbl_awayteams (
 CREATE TABLE tbl_homemanagers (
 	match_id	integer NOT NULL,
 	manager_id	integer	NOT NULL,
-	PRIMARY KEY (match_id, manager_id)
+	PRIMARY KEY (match_id, manager_id),
 	FOREIGN KEY (match_id) REFERENCES tbl_matches (match_id),
 	FOREIGN KEY (manager_id) REFERENCES tbl_managers (manager_id)	
 	) CHARACTER SET utf8 ENGINE=InnoDB;
@@ -336,7 +336,7 @@ CREATE TABLE tbl_homemanagers (
 CREATE TABLE tbl_awaymanagers (
 	match_id	integer NOT NULL,
 	manager_id	integer	NOT NULL,
-	PRIMARY KEY (match_id, manager_id)
+	PRIMARY KEY (match_id, manager_id),
 	FOREIGN KEY (match_id) REFERENCES tbl_matches (match_id),
 	FOREIGN KEY (manager_id) REFERENCES tbl_managers (manager_id)	
 	) CHARACTER SET utf8 ENGINE=InnoDB;	
@@ -442,7 +442,6 @@ CREATE TABLE tbl_cards (
 ALTER TABLE tbl_cards AUTO_INCREMENT=1;
 	
 -- Fouls table
-CREATE SEQUENCE foulseq increment 1 minvalue 10 maxvalue 99 start 10;
 CREATE TABLE tbl_fouls (
 	foul_id		integer NOT NULL AUTO_INCREMENT,
 	foul_desc 	varchar(40) NOT NULL,
@@ -511,7 +510,6 @@ CREATE TABLE tbl_penshootoutopeners (
     ) CHARACTER SET utf8 ENGINE=InnoDB;
     
 -- Substitutions table
-CREATE SEQUENCE subsseq increment 1 minvalue 100000 maxvalue 999999 start 100000;
 CREATE TABLE tbl_substitutions (
 	subs_id			integer NOT NULL AUTO_INCREMENT,
 	subs_time		integer NOT NULL CHECK (subs_time > 0 AND subs_time <= 120),
