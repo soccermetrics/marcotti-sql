@@ -33,7 +33,7 @@ CREATE VIEW timezone_list AS
 	SELECT timezone_id,
 				 tz_name,
 				 confed_name AS confed,
-				 trunc(tz_offset) || ':' || to_char(abs(tz_offset-trunc(tz_offset))*60, 'FM00') AS offset
+				 concat(truncate(tz_offset,0),':',lpad(abs(tz_offset-truncate(tz_offset,0))*60,2,'0')) AS offset
 	FROM tbl_timezones, tbl_confederations
 	WHERE tbl_timezones.confed_id = tbl_confederations.confed_id;
 				 				 
