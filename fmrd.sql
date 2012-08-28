@@ -115,6 +115,13 @@ CREATE TABLE tbl_competitions (
 	comp_name		varchar(100) NOT NULL
 	) WITH OIDS;
 	
+-- Seasons table
+CREATE SEQUENCE seasonseq increment 1 minvalue 100 maxvalue 999 start 1000;
+CREATE TABLE tbl_seasons (
+       season_id INTEGER PRIMARY KEY DEFAULT nextval('seasonseq'),
+       season_year VARCHAR(10) NOT NULL
+       ) WITH OIDS;
+	
 -- Competition Phases table	
 CREATE SEQUENCE phaseseq increment 1 minvalue 1 maxvalue 3 start 1;
 CREATE TABLE tbl_phases (
