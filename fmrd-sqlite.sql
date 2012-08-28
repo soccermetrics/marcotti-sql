@@ -104,6 +104,12 @@ CREATE TABLE tbl_competitions (
 	comp_name		varchar(100) NOT NULL
 	);
 	
+-- Seasons table
+CREATE TABLE tbl_seasons (
+   season_id INTEGER PRIMARY KEY,
+   season_year VARCHAR(10) NOT NULL
+   );
+
 -- Competition Phases table	
 CREATE TABLE tbl_phases (
     phase_id    integer PRIMARY KEY,

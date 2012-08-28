@@ -136,6 +136,14 @@ CREATE TABLE tbl_competitions (
 	PRIMARY KEY (competition_id)
 	) CHARACTER SET utf8 ENGINE=InnoDB;
 ALTER TABLE tbl_competitions AUTO_INCREMENT=100;
+
+-- Seasons table
+CREATE TABLE tbl_seasons (
+       season_id INTEGER NOT NULL AUTO_INCREMENT,
+       season_year VARCHAR(10) NOT NULL,
+       PRIMARY KEY (season_id)
+       ) CHARACTER SET utf8 ENGINE=InnoDB;
+ALTER TABLE tbl_seasons AUTO_INCREMENT=100;
 	
 -- Competition Phases table	
 CREATE TABLE tbl_phases (
