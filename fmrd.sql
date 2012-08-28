@@ -213,6 +213,7 @@ CREATE TABLE tbl_matches (
 	match_secondovertime    integer DEFAULT 0 CHECK (match_secondovertime >= 0),
 	match_attendance		integer DEFAULT 0 CHECK (match_attendance >= 0),
 	competition_id			integer REFERENCES tbl_competitions,
+    season_id               integer REFERENCES tbl_seasons,
 	phase_id                integer REFERENCES tbl_phases,
 	venue_id				integer REFERENCES tbl_venues,
 	referee_id				integer REFERENCES tbl_referees

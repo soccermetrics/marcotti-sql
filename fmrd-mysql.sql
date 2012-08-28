@@ -250,11 +250,13 @@ CREATE TABLE tbl_matches (
 	match_secondovertime    integer DEFAULT 0 CHECK (match_secondovertime >= 0),
 	match_attendance		integer DEFAULT 0 CHECK (match_attendance >= 0),
 	competition_id			integer NOT NULL,
+    season_id               integer NOT NULL,
 	phase_id                integer NOT NULL,
 	venue_id				integer NOT NULL,
 	referee_id				integer NOT NULL,
 	PRIMARY KEY (match_id),
 	FOREIGN KEY (competition_id) REFERENCES tbl_competitions (competition_id),
+	FOREIGN KEY (season_id) REFERENCES tbl_seasons(season_id),
 	FOREIGN KEY (phase_id) REFERENCES tbl_phases (phase_id),
 	FOREIGN KEY (venue_id) REFERENCES tbl_venues (venue_id),
 	FOREIGN KEY (referee_id) REFERENCES tbl_referees (referee_id)
