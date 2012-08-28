@@ -8,10 +8,10 @@ This implementation supports a data model for clubs participating in
 league, knockout, or hybrid (league+knockout) competitions.  There 
 are four categories under which the tables are classified:
 
-**Overview**: High-level data about the football competition
-**Personnel**: Participants and officials in the football match
-**Match**: High-level data about the match
-**Match Events**: The main events of the football match
+* **Overview**: High-level data about the football competition
+* **Personnel**: Participants and officials in the football match
+* **Match**: High-level data about the match
+* **Match Events**: The main events of the football match
 
 The following tables are implemented:
 
