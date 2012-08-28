@@ -2,16 +2,16 @@ FMRD-SQL Version 1.4.0a
 =======================
 
 This is the SQL implementation of the Football Match Result Database.
-It currently operates on PostgreSQL and SQLite databases.
+It currently operates on PostgreSQL, MySQL, and SQLite databases.
 
 This implementation supports a data model for national teams participating in
 league, knockout, or hybrid (league+knockout) competitions.  There 
 are four categories under which the tables are classified:
 
-*Overview*: High-level data about the football competition
-*Personnel*: Participants and officials in the football match
-*Match*: High-level data about the match
-*Match Events*: The main events of the football match
+* **Overview**: High-level data about the football competition
+* **Personnel**: Participants and officials in the football match
+* **Match**: High-level data about the match
+* **Match Events**: The main events of the football match
 
 The following tables are implemented:
 
