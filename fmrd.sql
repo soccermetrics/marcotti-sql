@@ -18,9 +18,9 @@ CREATE TABLE tbl_confederations (
 -- Country table
 CREATE SEQUENCE ctryseq increment 1 minvalue 100 maxvalue 999 start 100;
 CREATE TABLE tbl_countries (
-	country_id	integer PRIMARY KEY DEFAULT nextval('ctryseq'),
-	confed_id	integer REFERENCES tbl_confederations,
-	cty_name	varchar(60) NOT NULL
+	country_id	  integer PRIMARY KEY DEFAULT nextval('ctryseq'),
+	confed_id	  integer REFERENCES tbl_confederations,
+	country_name  varchar(60) NOT NULL
 	) WITH OIDS;
 
 -- Field position table
@@ -111,16 +111,16 @@ CREATE TABLE tbl_venuesurfaces (
 -- Competitions table
 CREATE SEQUENCE compseq increment 1 minvalue 100 maxvalue 999 start 100;
 CREATE TABLE tbl_competitions (
-	competition_id	integer PRIMARY KEY DEFAULT nextval('compseq'),
-	comp_name		varchar(100) NOT NULL
+	competition_id      integer PRIMARY KEY DEFAULT nextval('compseq'),
+	competition_name    varchar(100) NOT NULL
 	) WITH OIDS;
 	
 -- Seasons table
 CREATE SEQUENCE seasonseq increment 1 minvalue 100 maxvalue 999 start 1000;
 CREATE TABLE tbl_seasons (
-       season_id INTEGER PRIMARY KEY DEFAULT nextval('seasonseq'),
-       season_year VARCHAR(10) NOT NULL
-       ) WITH OIDS;
+   season_id INTEGER PRIMARY KEY DEFAULT nextval('seasonseq'),
+   season_year VARCHAR(10) NOT NULL
+   ) WITH OIDS;
 	
 -- Competition Phases table	
 CREATE SEQUENCE phaseseq increment 1 minvalue 1 maxvalue 3 start 1;
@@ -169,7 +169,7 @@ CREATE SEQUENCE teamseq increment 1 minvalue 10000 maxvalue 99999 start 10000;
 CREATE TABLE tbl_teams (
 	team_id 	integer PRIMARY KEY DEFAULT nextval('teamseq'),
     country_id  integer REFERENCES tbl_countries,
-	tm_name	    varchar(50) NOT NULL
+	team_name	varchar(50) NOT NULL
 	) WITH OIDS;		
 	
 -- Venues table
@@ -307,7 +307,7 @@ CREATE TABLE tbl_weather (
 	) WITH OIDS;
 
 -- ------------------------------------------	
--- Linking tables	to Weather Condition tables
+-- Linking tables to Weather Condition tables
 -- ------------------------------------------
 
 -- Kickoff weather condition table
@@ -335,28 +335,28 @@ CREATE TABLE tbl_weatherfulltime (
 -- Match Event Tables
 -- -------------------------------------------------
 
--- Goal strikes table
-CREATE SEQUENCE gstkseq increment 1 minvalue 1 maxvalue 9 start 1;
-CREATE TABLE tbl_goalstrikes (
-	gtstype_id		integer PRIMARY KEY DEFAULT nextval('gstkseq'),
-	gts_desc		varchar(15) NOT NULL
-	) WITH OIDS;
+-- Body part table
+CREATE SEQUENCE bodyseq increment 1 minvalue 1 maxvalue 9 start 1;
+CREATE TABLE tbl_bodyparts (
+	bodypart_id		integer PRIMARY KEY DEFAULT nextval('bodyseq'),
+	body_desc		varchar(15) NOT NULL
+	) WITH OIDS;         
 	
--- Goal events table
-CREATE SEQUENCE gevtseq increment 1 minvalue 10 maxvalue 99 start 10;
-CREATE TABLE tbl_goalevents (
-	gtetype_id		integer PRIMARY KEY DEFAULT nextval('gevtseq'),
-	gte_desc		varchar(30) NOT NULL
-	) WITH OIDS;
-
+-- Shot events table
+CREATE SEQUENCE sevtseq increment 1 minvalue 10 maxvalue 99 start 10;
+CREATE TABLE tbl_shotevents (
+	shotevent_id	integer PRIMARY KEY DEFAULT nextval('sevtseq'),
+	shotevent_desc	varchar(30) NOT NULL
+	) WITH OIDS;	
+	
 -- Goals table	
 CREATE SEQUENCE goalseq increment 1 minvalue 100000 maxvalue 999999 start 100000;
 CREATE TABLE tbl_goals (
-	goal_id			integer PRIMARY KEY DEFAULT nextval('goalseq'),
-	team_id			integer REFERENCES tbl_teams,
-	lineup_id		integer REFERENCES tbl_lineups,
-	gtstype_id		integer REFERENCES tbl_goalstrikes,
-	gtetype_id		integer REFERENCES tbl_goalevents,
+	goal_id         integer PRIMARY KEY DEFAULT nextval('goalseq'),
+	team_id         integer REFERENCES tbl_teams,
+	lineup_id       integer REFERENCES tbl_lineups,
+	bodypart_id     integer REFERENCES tbl_bodyparts,
+	shotevent_id    integer REFERENCES tbl_shotevents,
 	gls_time		integer NOT NULL CHECK (gls_time > 0 AND gls_time <= 120),
 	gls_stime		integer DEFAULT 0 CHECK (gls_stime >= 0 AND gls_stime <= 15)
 	) WITH OIDS;
