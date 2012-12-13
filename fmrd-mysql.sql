@@ -19,9 +19,9 @@ ALTER TABLE tbl_confederations AUTO_INCREMENT=10;
 
 -- Country table
 CREATE TABLE tbl_countries (
-	country_id	integer NOT NULL AUTO_INCREMENT,
-	confed_id	integer NOT NULL,
-	cty_name	varchar(60) NOT NULL,
+	country_id      integer NOT NULL AUTO_INCREMENT,
+	confed_id       integer NOT NULL,
+	country_name    varchar(60) NOT NULL,
 	PRIMARY KEY (country_id),
 	FOREIGN KEY (confed_id) REFERENCES tbl_confederations (confed_id)
 	) CHARACTER SET utf8 ENGINE=InnoDB;
@@ -131,8 +131,8 @@ ALTER TABLE tbl_venuesurfaces AUTO_INCREMENT=1;
 
 -- Competitions table
 CREATE TABLE tbl_competitions (
-	competition_id	integer NOT NULL AUTO_INCREMENT,
-	comp_name		varchar(100) NOT NULL,
+	competition_id      integer NOT NULL AUTO_INCREMENT,
+	competition_name    varchar(100) NOT NULL,
 	PRIMARY KEY (competition_id)
 	) CHARACTER SET utf8 ENGINE=InnoDB;
 ALTER TABLE tbl_competitions AUTO_INCREMENT=100;
@@ -195,9 +195,9 @@ ALTER TABLE tbl_matchdays AUTO_INCREMENT=1;
 
 -- Teams table	
 CREATE TABLE tbl_teams (
-	team_id 	integer NOT NULL AUTO_INCREMENT,
+	team_id     integer NOT NULL AUTO_INCREMENT,
     country_id  integer NOT NULL,
-	tm_name	    varchar(50) NOT NULL,
+	team_name   varchar(50) NOT NULL,
 	PRIMARY KEY (team_id),
 	FOREIGN KEY (country_id) REFERENCES tbl_countries (country_id)
 	) CHARACTER SET utf8 ENGINE=InnoDB;
@@ -410,21 +410,22 @@ CREATE TABLE tbl_weatherfulltime (
 -- Match Event Tables
 -- -------------------------------------------------
 
--- Goal strikes table
-CREATE TABLE tbl_goalstrikes (
-	gtstype_id		integer NOT NULL AUTO_INCREMENT,
-	gts_desc		varchar(15) NOT NULL,
-	PRIMARY KEY (gtstype_id)
-	) CHARACTER SET utf8 ENGINE=InnoDB;
-ALTER TABLE tbl_goalstrikes AUTO_INCREMENT=1;
+-- Body part table
+CREATE TABLE tbl_bodyparts (
+	bodypart_id		integer NOT NULL AUTO_INCREMENT,
+	body_desc		varchar(15) NOT NULL,
+	PRIMARY KEY (bodypart_id)
+	) CHARACTER SET utf8 ENGINE=InnoDB;         
+ALTER TABLE tbl_bodyparts AUTO_INCREMENT=1;
 	
--- Goal events table
-CREATE TABLE tbl_goalevents (
-	gtetype_id		integer NOT NULL AUTO_INCREMENT,
-	gte_desc		varchar(30) NOT NULL,
-	PRIMARY KEY (gtetype_id)
-	) CHARACTER SET utf8 ENGINE=InnoDB;
-ALTER TABLE tbl_goalevents AUTO_INCREMENT=10;
+-- Shot events table
+CREATE SEQUENCE sevtseq increment 1 minvalue 10 maxvalue 99 start 10;
+CREATE TABLE tbl_shotevents (
+	shotevent_id	integer NOT NULL AUTO_INCREMENT,
+	shotevent_desc	varchar(30) NOT NULL,
+	PRIMARY KEY (shotevent_id)
+	) CHARACTER SET utf8 ENGINE=InnoDB;	
+ALTER TABLE tbl_shotevents AUTO_INCREMENT=10;
 
 -- Goals table	
 CREATE TABLE tbl_goals (
@@ -438,8 +439,8 @@ CREATE TABLE tbl_goals (
 	PRIMARY KEY (goal_id),
 	FOREIGN KEY (team_id) REFERENCES tbl_teams (team_id),
 	FOREIGN KEY (lineup_id) REFERENCES tbl_lineups (lineup_id),
-	FOREIGN KEY (gtstype_id) REFERENCES tbl_goalstrikes (gtstype_id),
-	FOREIGN KEY (gtetype_id) REFERENCES tbl_goalevents (gtetype_id)
+	FOREIGN KEY (bodypart_id) REFERENCES tbl_bodyparts (bodypart_id),
+	FOREIGN KEY (shotevent_id) REFERENCES tbl_shotevents (shotevent_id)
 	) CHARACTER SET utf8 ENGINE=InnoDB;
 ALTER TABLE tbl_goals AUTO_INCREMENT=100000;
 	

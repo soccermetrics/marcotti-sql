@@ -15,9 +15,9 @@ CREATE TABLE tbl_confederations (
 
 -- Country table
 CREATE TABLE tbl_countries (
-	country_id	integer PRIMARY KEY,
-	confed_id	integer REFERENCES tbl_confederations(confed_id),
-	cty_name	varchar(60) NOT NULL
+	country_id      integer PRIMARY KEY,
+	confed_id       integer REFERENCES tbl_confederations(confed_id),
+	country_name    varchar(60) NOT NULL
 	);
 
 -- Field position table
@@ -98,8 +98,8 @@ CREATE TABLE tbl_venuesurfaces (
 
 -- Competitions table
 CREATE TABLE tbl_competitions (
-	competition_id	integer PRIMARY KEY,
-	comp_name		varchar(100) NOT NULL
+	competition_id      integer PRIMARY KEY,
+	competition_name    varchar(100) NOT NULL
 	);
 	
 -- Seasons table
@@ -146,9 +146,9 @@ CREATE TABLE tbl_matchdays (
 
 -- Teams table	
 CREATE TABLE tbl_teams (
-	team_id 	integer PRIMARY KEY,
+	team_id     integer PRIMARY KEY,
     country_id  integer REFERENCES tbl_countries(country_id),
-	tm_name	    varchar(50) NOT NULL
+	team_name   varchar(50) NOT NULL
 	);		
 	
 -- Venues table
@@ -308,25 +308,25 @@ CREATE TABLE tbl_weatherfulltime (
 -- Match Event Tables
 -- -------------------------------------------------
 
--- Goal strikes table
-CREATE TABLE tbl_goalstrikes (
-	gtstype_id		integer PRIMARY KEY,
-	gts_desc		varchar(15) NOT NULL
-	);
+-- Body part table
+CREATE TABLE tbl_bodyparts (
+	bodypart_id		integer PRIMARY KEY,
+	body_desc		varchar(15) NOT NULL
+	);         
 	
--- Goal events table
-CREATE TABLE tbl_goalevents (
-	gtetype_id		integer PRIMARY KEY,
-	gte_desc		varchar(30) NOT NULL
-	);
+-- Shot events table
+CREATE TABLE tbl_shotevents (
+	shotevent_id	integer PRIMARY KEY,
+	shotevent_desc	varchar(30) NOT NULL
+	);	
 
 -- Goals table	
 CREATE TABLE tbl_goals (
 	goal_id			integer PRIMARY KEY,
 	team_id			integer REFERENCES tbl_teams(team_id),
 	lineup_id		integer REFERENCES tbl_lineups(lineup_id),
-	gtstype_id		integer REFERENCES tbl_goalstrikes(gtstype_id),
-	gtetype_id		integer REFERENCES tbl_goalevents(gtetype_id),
+	bodypart_id     integer REFERENCES tbl_bodyparts(bodypart_id),
+	shotevent_id    integer REFERENCES tbl_shotevents(shotevent_id),
 	gls_time		integer NOT NULL CHECK (gls_time > 0 AND gls_time <= 120),
 	gls_stime		integer DEFAULT 0 CHECK (gls_stime >= 0 AND gls_stime <= 15)
 	);
