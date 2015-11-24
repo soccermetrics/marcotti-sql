@@ -1,6 +1,8 @@
 FMRD-SQL Version 1.3.5
 ======================
 
+_This repository is no longer being supported.  Follow [this link](https://github.com/soccermetrics/marcotti) to the current Marcotti project._
+
 This is the SQL implementation of the Football Match Result Database.
 It currently operates on PostgreSQL and SQLite databases.
 
